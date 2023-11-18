@@ -10,7 +10,6 @@ export interface ServerOptions {
   /** The network address to listen on expediently.
    * @default 0.0.0.0 */
   bindAddress?: string,
-
   /** Encoding of the messages we expect from the HL7 message.
    * @default "utf-8"
    */
@@ -48,7 +47,7 @@ export default function normalizeOptions(raw?: ServerOptions): ValidatedOptions 
   }
 
   if (typeof props.bindAddress !== 'string') {
-      throw new Error('url is not valid string.')
+      throw new Error('bindAddress is not valid string.')
   }
 
   if (props.tls === true) {
