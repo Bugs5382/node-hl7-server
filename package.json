@@ -25,6 +25,7 @@
     "pack": "npm run clean && npm run test:ci && npm run build && npm pack",
     "prepublishOnly": "npm run clean && npm run build",
     "test": "jest",
+    "test:watch": "jest --watch --ci",
     "test:ci": "jest --ci",
     "test:coverage": "jest --coverage",
     "typedoc": "typedoc",
@@ -65,5 +66,8 @@
     "tsd": "^0.29.0",
     "typedoc": "^0.25.3",
     "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "node-hl7-client": "file:../node-hl7-client"
   }
 }

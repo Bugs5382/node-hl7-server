@@ -63,19 +63,37 @@ export class Server extends EventEmitter {
   /** @internal */
   _handler: any;
 
-  constructor(props?: ServerOptions) {
+  constructor() {
     super();
 
     this._listen = this._listen.bind(this)
     this._onTcpClientConnected = this._onTcpClientConnected.bind(this)
 
-    this._opt = normalizeOptions(props)
+    this._opt = normalizeOptions()
 
     this._connected = false;
     this._sockets = []
     this._handler = ''
 
     this._server = this._listen()
+
+  }
+
+  /** This creates an instance of a HL7 server.
+   * @since 1.0.0 */
+  async create(props?: ServerOptions) {
+    this._opt = normalizeOptions(props)
+  }
+
+  /** This starts the instance of the HL7 server on the particular port.
+   * @since 1.0.0 */
+  async listen() {
+
+  }
+
+  /** This creates an instance of a HL7 server.
+   * @since 1.0.0 */
+  async close() {
 
   }
 
