@@ -157,7 +157,7 @@ export class Listener extends EventEmitter {
 
     // eslint-disable-next-line no-unused-vars
     socket.on('close', hadError => {
-      this.emit('client.cloe', hadError)
+      this.emit('client.close', hadError)
       this._closeSocket(socket)
     })
 
