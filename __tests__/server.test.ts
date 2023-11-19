@@ -144,6 +144,16 @@ describe('node hl7 server', () => {
 
     })
 
+    test.todo('... should not be able to listen on the same port')
+
+    test.todo('... two different ports')
+
+  })
+
+  describe('end to end testing', () => {
+
+    test.todo('... send HL7 and get response back')
+
   })
 
 })
