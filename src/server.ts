@@ -1,6 +1,6 @@
 import EventEmitter from 'events'
-import { Listener, ListenerHandler } from './listener'
-import { ServerOptions, normalizeServerOptions, ListenerOptions } from './normalize'
+import { Listener, ListenerHandler } from './listener.js'
+import { ServerOptions, normalizeServerOptions, ListenerOptions } from './normalize.js'
 
 export class Server extends EventEmitter {
   /** @internal */

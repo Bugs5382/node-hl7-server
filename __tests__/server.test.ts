@@ -134,13 +134,13 @@ describe('node hl7 server', () => {
     })
 
     test('... listen on a randomized port', async () => {
+      const server = new Server()
+      const listener = server.createListener({ port: LISTEN_PORT}, async () => {})
+      const usedCheck = await tcpPortUsed.check(LISTEN_PORT, '0.0.0.0')
 
-        const server = new Server()
-        server.createListener({ port: LISTEN_PORT}, async () => {})
+      expect(usedCheck).toBe(true)
 
-        const usedCheck = await tcpPortUsed.check(LISTEN_PORT, '0.0.0.0')
-
-        expect(usedCheck).toBe(true)
+      await listener.close()
 
     })
 

@@ -60,7 +60,7 @@ export class Listener extends EventEmitter {
   /** @internal */
   _sockets: Socket[]
   /** @internal */
-  _connected: boolean // @todo This should be "set" status, "READY" (accepting inbound connections), "NOT READY" (paused or turned off for some reason), "ERROR" (we errored out. Will attempt to re-create, but no returnees..
+  _connected: boolean
   /** @internal */
   _handler: any
 
@@ -80,6 +80,23 @@ export class Listener extends EventEmitter {
     this._listen = this._listen.bind(this)
     this._onTcpClientConnected = this._onTcpClientConnected.bind(this)
     this._server = this._listen()
+  }
+
+  /** Close Listener Instance.
+   * This be called for each listener, but if the server instance is closed shut down, this will also fire off.
+   * @since 1.0.0 */
+  async close(): Promise<boolean> {
+
+    for (const i in this._sockets) {
+      this._sockets[i].destroy(); // tell the client we are going to be closing up shop
+    }
+
+    this._server?.close(()=> {
+      this._server?.unref();
+    });
+
+    return  true
+
   }
 
   /** @internal */
