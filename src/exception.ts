@@ -1,18 +1,24 @@
-/** Low severity */
-class HL7ServerError extends Error {
+/** Base Error Class */
+class HL7Error extends Error {
   code: string
   /** @internal */
-  constructor(code: string, message: string) {
+  constructor (code: string, message: string) {
     super(message)
-    this.name = 'HL7ClientError'
+    this.name = 'HL7Error'
     this.code = code
   }
 }
 
-/** High severity. All pending actions are rejected and all connections are closed. The connection is reset. */
-class HL7ServerConnectionError extends HL7ServerError {
+/** Server Error */
+class HL7ServerError extends HL7Error {
   /** @internal */
-  name = 'HL7ServerConnectionError'
+  name = 'HL7ServerError'
 }
 
-export {HL7ServerError, HL7ServerConnectionError}
+/** Listener Error */
+class HL7ListenerError extends HL7Error {
+  /** @internal */
+  name = 'HL7ListenerError'
+}
+
+export { HL7ListenerError, HL7ServerError, HL7Error }
