@@ -1,6 +1,7 @@
 import portfinder from 'portfinder'
 import tcpPortUsed from 'tcp-port-used'
 import { Server } from '../src'
+import {expectEvent} from "./__utils__/utils";
 
 describe('node hl7 server', () => {
 
@@ -144,10 +145,29 @@ describe('node hl7 server', () => {
 
     })
 
-    test.todo('... should not be able to listen on the same port')
+    test('... should not be able to listen on the same port', async () => {
+      const server = new Server()
+      const listenerOne = server.createListener({ port: LISTEN_PORT}, async () => {})
+      const listenerTwo = server.createListener({ port: LISTEN_PORT}, async () => {})
 
-    test.todo('... two different ports')
+      await expectEvent(listenerTwo, 'error')
 
+      await listenerOne.close()
+
+    })
+
+    test('... two different ports', async () => {
+      const server = new Server()
+      const listenerOne = server.createListener({ port: LISTEN_PORT}, async () => {})
+      const listenerTwo = server.createListener({ port: await portfinder.getPortPromise({
+          port: 3001,
+          stopPort: 65353
+        })}, async () => {})
+
+      await listenerOne.close()
+      await listenerTwo.close()
+
+    })
   })
 
   describe('end to end testing', () => {
