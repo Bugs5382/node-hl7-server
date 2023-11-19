@@ -1,15 +1,12 @@
-import EventEmitter from "events";
-import net from "net";
-import {Socket} from "net";
-import {CR, FS, VT} from "./constants.js";
-import {normalizeListenerOptions, ListenerOptions } from "./normalize.js";
-import {Server} from "./server.js";
+import EventEmitter from 'events'
+import net, { Socket } from 'net'
+import { CR, FS, VT } from './constants.js'
+import { normalizeListenerOptions, ListenerOptions } from './normalize.js'
+import { Server } from './server.js'
 
-export interface ListenerHandler {
-  (req: Req, res: Res): Promise<void>
-}
+export type ListenerHandler = (req: ListenerRequest, res: ListenerResponse) => Promise<void>
 
-export class Req {
+export class ListenerRequest {
   _msg: string
   // @ts-expect-error
   _parsed: string
@@ -36,7 +33,7 @@ export class Req {
   }
 }
 
-export class Res {
+export class ListenerResponse {
   /** @internal */
   _ack: any
   /** @internal */
@@ -53,7 +50,6 @@ export class Res {
   }
 }
 
-
 export class Listener extends EventEmitter {
   /** @internal */
   _main: Server
@@ -68,8 +64,8 @@ export class Listener extends EventEmitter {
   /** @internal */
   _handler: any
 
-  constructor(server: Server, props: ListenerOptions, handler: ListenerHandler) {
-    super();
+  constructor (server: Server, props: ListenerOptions, handler: ListenerHandler) {
+    super()
 
     this._main = server
 
@@ -80,11 +76,7 @@ export class Listener extends EventEmitter {
     this._sockets = []
 
     this._handler = handler
-  }
 
-  /** This starts the instance of the HL7 server on the particular port.
-   * @since 1.0.0 */
-  async listen () {
     this._listen = this._listen.bind(this)
     this._onTcpClientConnected = this._onTcpClientConnected.bind(this)
     this._server = this._listen()
@@ -93,6 +85,9 @@ export class Listener extends EventEmitter {
   /** @internal */
   private _listen () {
     const encoding = this._opt?.encoding
+    const port = this._opt.port
+    const bindAddress = this._main._opt.bindAddress
+    const ipv6 = this._main._opt.ipv6
 
     const server = net.createServer(socket => this._onTcpClientConnected(socket, encoding))
 
@@ -104,7 +99,7 @@ export class Listener extends EventEmitter {
       this.emit('error', err)
     })
 
-    server.listen({ port: this._opt.port }, () => {
+    server.listen({ port, ipv6Only: ipv6, hostname: bindAddress }, () => {
       this._connected = true
     })
 
@@ -128,8 +123,8 @@ export class Listener extends EventEmitter {
         if (message.substring(message.length - 2, message.length) === FS + CR) {
           const cleanHL7 = message.substring(1, message.length - 2)
           const ack = this._createAckMessage(cleanHL7)
-          const req = new Req(cleanHL7)
-          const res = new Res(socket, ack)
+          const req = new ListenerRequest(cleanHL7)
+          const res = new ListenerResponse(socket, ack)
           this._handler(null, req, res)
           message = ''
         }
@@ -162,5 +157,4 @@ export class Listener extends EventEmitter {
     socket.destroy()
     this._sockets.splice(this._sockets.indexOf(socket), 1)
   }
-
 }

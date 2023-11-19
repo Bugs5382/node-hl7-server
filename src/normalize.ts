@@ -12,7 +12,6 @@ const DEFAULT_LISTENER_OPTS = {
   encoding: 'utf-8'
 }
 
-
 export interface ServerOptions {
   /** The network address to listen on expediently.
    * @default 0.0.0.0 */
@@ -58,15 +57,19 @@ export function normalizeServerOptions (raw?: ServerOptions): ServerOptions {
   const props: any = { ...DEFAULT_SERVER_OPTS, ...raw }
 
   if (props.ipv4 && props.ipv6) {
-    throw new Error(`'ipv4 and ipv6 both can't be set to be exclusive.'`)
+    throw new Error('ipv4 and ipv6 both can\'t be set to be exclusive.')
   }
 
   if (typeof props.bindAddress !== 'string') {
     throw new Error('bindAddress is not valid string.')
   }
 
-  if (props.tls === true) {
-    props.tls = {}
+  if (typeof props.bindAddress !== 'undefined' && props.ipv6 && !validIPv6(props.bindAddress)) {
+    throw new Error('bindAddress is an invalid ipv6 address.')
+  }
+
+  if (typeof props.bindAddress !== 'undefined' && !props.ipv6 && !validIPv4(props.bindAddress)) {
+    throw new Error('bindAddress is an invalid ipv4 address.')
   }
 
   return props
@@ -76,13 +79,13 @@ export function normalizeServerOptions (raw?: ServerOptions): ServerOptions {
 export function normalizeListenerOptions (raw?: ListenerOptions): ValidatedOptions {
   const props: any = { ...DEFAULT_LISTENER_OPTS, ...raw }
 
-  let nameFormat = /[ `!@#$%^&*()+\-=\[\]{};':"\\|,.<>\/?~]/;
+  const nameFormat = /[ `!@#$%^&*()+\-=\[\]{};':"\\|,.<>\/?~]/ //eslint-disable-line
 
-  if (typeof props.name == 'undefined') {
+  if (typeof props.name === 'undefined') {
     props.name = randomString()
   } else {
     if (nameFormat.test(props.name)) {
-      throw new Error(`name must not contain these character: ${nameFormat}`)
+      throw new Error(`name must not contain these characters: ${nameFormat}`)
     }
   }
 
@@ -108,14 +111,32 @@ function assertNumber (props: Record<string, number>, name: string, min: number,
   }
 }
 
-function randomString(length = 20) {
-  let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_';
-  const charactersLength = characters.length;
-  let counter = 0;
+function randomString (length = 20): string {
+  let result = ''
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_'
+  const charactersLength = characters.length
+  let counter = 0
   while (counter < length) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    counter += 1;
+    result += characters.charAt(Math.floor(Math.random() * charactersLength))
+    counter += 1
   }
-  return result;
+  return result
+}
+
+/** @internal */
+function validIPv4 (ip: string): boolean {
+  const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/
+  if (ipv4Regex.test(ip)) {
+    return ip.split('.').every(part => parseInt(part) <= 255)
+  }
+  return false
+}
+
+/** @internal */
+function validIPv6 (ip: string): boolean {
+  const ipv6Regex = /^([\da-f]{1,4}:){7}[\da-f]{1,4}$/i
+  if (ipv6Regex.test(ip)) {
+    return ip.split(':').every(part => part.length <= 4)
+  }
+  return false
 }

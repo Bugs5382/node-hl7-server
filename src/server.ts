@@ -1,13 +1,13 @@
 import EventEmitter from 'events'
-import {Listener, ListenerHandler} from "./listener";
-import {ServerOptions, normalizeServerOptions, ListenerOptions} from "./normalize";
+import { Listener, ListenerHandler } from './listener'
+import { ServerOptions, normalizeServerOptions, ListenerOptions } from './normalize'
 
 export class Server extends EventEmitter {
   /** @internal */
   _opt: ReturnType<typeof normalizeServerOptions>
 
-  constructor(props?: ServerOptions) {
-    super();
+  constructor (props?: ServerOptions) {
+    super()
 
     this._opt = normalizeServerOptions(props)
   }
@@ -17,5 +17,4 @@ export class Server extends EventEmitter {
   createListener (props: ListenerOptions, cb: ListenerHandler): Listener {
     return new Listener(this, props, cb)
   }
-
 }
