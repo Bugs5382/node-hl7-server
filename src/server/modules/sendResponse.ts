@@ -1,11 +1,10 @@
 import { Socket } from 'net'
-import { CR, FS, VT } from '../../utils/constants.js'
 
 /**
  * Listener Response
  * @since 1.0.0
  */
-export class ListenerResponse {
+export class SendResponse {
   /** @internal */
   _ack: any
   /** @internal */
@@ -17,7 +16,7 @@ export class ListenerResponse {
     this._ack = ack
     this._socket = socket
     this._end = function () {
-      socket.write(`${VT}${this._ack.toString()}${FS}${CR}`)
+      socket.write(Buffer.from('This is a test.'))
     }
   }
 }

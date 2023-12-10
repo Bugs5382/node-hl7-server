@@ -59,20 +59,20 @@ interface ValidatedOptions extends Pick<Required<ListenerOptions>, ValidatedKeys
 export function normalizeServerOptions (raw?: ServerOptions): ServerOptions {
   const props: any = { ...DEFAULT_SERVER_OPTS, ...raw }
 
-  if (props.ipv4 && props.ipv6) {
+  if (props.ipv4 === true && props.ipv6 === true) {
     throw new HL7ServerError(500, 'ipv4 and ipv6 both can\'t be set to be exclusive.')
   }
 
   if (typeof props.bindAddress !== 'string') {
     throw new HL7ServerError(500, 'bindAddress is not valid string.')
-  }
+  } else if (props.bindAddress !== 'localhost') {
+    if (typeof props.bindAddress !== 'undefined' && props.ipv6 === true && !validIPv6(props.bindAddress)) {
+      throw new HL7ServerError(500, 'bindAddress is an invalid ipv6 address.')
+    }
 
-  if (typeof props.bindAddress !== 'undefined' && props.ipv6 && !validIPv6(props.bindAddress)) {
-    throw new HL7ServerError(500, 'bindAddress is an invalid ipv6 address.')
-  }
-
-  if (typeof props.bindAddress !== 'undefined' && !props.ipv6 && !validIPv4(props.bindAddress)) {
-    throw new HL7ServerError(500, 'bindAddress is an invalid ipv4 address.')
+    if (typeof props.bindAddress !== 'undefined' && props.ipv4 === true && !validIPv4(props.bindAddress)) {
+      throw new HL7ServerError(500, 'bindAddress is an invalid ipv4 address.')
+    }
   }
 
   return props
