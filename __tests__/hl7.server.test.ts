@@ -1,9 +1,9 @@
+import {Socket} from "node:net";
 import portfinder from 'portfinder'
 import tcpPortUsed from 'tcp-port-used'
-import {Client} from "../../node-hl7-client/src";
-import {Message} from "../../node-hl7-client/src";
+import {Client, Message} from "../../node-hl7-client/src";
 import { Server } from '../src'
-import {expectEvent} from "./__utils__/utils";
+import {expectEvent, sleep} from "./__utils__/utils";
 
 describe('node hl7 server', () => {
 
@@ -68,7 +68,7 @@ describe('node hl7 server', () => {
 
     test(`properties exist`, async  () => {
       const server = new Server()
-      expect(server).toHaveProperty("createListener")
+      expect(server).toHaveProperty("createInbound")
     })
 
   })
@@ -80,7 +80,7 @@ describe('node hl7 server', () => {
       try {
         const server = new Server()
         // @ts-expect-error port is not specified
-        server.createListener()
+        server.createInbound()
       } catch (err: any) {
         expect(err.message).toBe('port is not defined.')
       }
@@ -91,7 +91,7 @@ describe('node hl7 server', () => {
       try {
         const server = new Server()
         // @ts-expect-error port is not specified
-        server.createListener({ port: "12345"}, async () => {})
+        server.createInbound({ port: "12345"}, async () => {})
       } catch (err: any) {
         expect(err.message).toBe('port is not valid number.')
       }
@@ -100,7 +100,7 @@ describe('node hl7 server', () => {
     test('error - port less than 0', async () => {
       try {
         const server = new Server()
-        server.createListener({ port: -1}, async () => {})
+        server.createInbound({ port: -1}, async () => {})
       } catch (err: any) {
         expect(err.message).toBe('port must be a number (0, 65353).')
       }
@@ -109,7 +109,7 @@ describe('node hl7 server', () => {
     test('error - port greater than 65353', async () => {
       try {
         const server = new Server()
-        server.createListener({ port: 65354}, async () => {})
+        server.createInbound({ port: 65354}, async () => {})
       } catch (err: any) {
         expect(err.message).toBe('port must be a number (0, 65353).')
       }
@@ -118,7 +118,7 @@ describe('node hl7 server', () => {
     test('error - name is invalid', async () => {
       try {
         const server = new Server()
-        server.createListener({ name: "$#@!sdfe-`", port: 65354}, async () => {})
+        server.createInbound({ name: "$#@!sdfe-`", port: 65354}, async () => {})
       } catch (err: any) {
         expect(err.message).toContain(`name must not contain certain characters: \`!@#$%^&*()+\\-=\\[\\]{};':\"\\\\|,.<>\\/?~.`)
       }
@@ -138,7 +138,7 @@ describe('node hl7 server', () => {
 
     test('...listen on a randomized port', async () => {
       const server = new Server()
-      const listener = server.createListener({ port: LISTEN_PORT}, async () => {})
+      const listener = server.createInbound({ port: LISTEN_PORT}, async () => {})
       const usedCheck = await tcpPortUsed.check(LISTEN_PORT, '0.0.0.0')
 
       expect(usedCheck).toBe(true)
@@ -149,8 +149,8 @@ describe('node hl7 server', () => {
 
     test('...should not be able to listen on the same port', async () => {
       const server = new Server()
-      const listenerOne = server.createListener({ port: LISTEN_PORT}, async () => {})
-      const listenerTwo = server.createListener({ port: LISTEN_PORT}, async () => {})
+      const listenerOne = server.createInbound({ port: LISTEN_PORT}, async () => {})
+      const listenerTwo = server.createInbound({ port: LISTEN_PORT}, async () => {})
 
       await expectEvent(listenerTwo, 'error')
 
@@ -160,8 +160,8 @@ describe('node hl7 server', () => {
 
     test('...two different ports', async () => {
       const server = new Server()
-      const listenerOne = server.createListener({ port: LISTEN_PORT}, async () => {})
-      const listenerTwo = server.createListener({ port: await portfinder.getPortPromise({
+      const listenerOne = server.createInbound({ port: LISTEN_PORT}, async () => {})
+      const listenerTwo = server.createInbound({ port: await portfinder.getPortPromise({
           port: 3001,
           stopPort: 65353
         })}, async () => {})
@@ -171,23 +171,40 @@ describe('node hl7 server', () => {
 
     })
 
-    test('...basic client connect to server', async () => {
+  })
 
-      const server = new Server()
-      const listener = server.createListener({ port: LISTEN_PORT}, async (data: any) => {
-        console.log('We did it.')
-        console.log(data)
+  describe('end to end tests', () => {
+
+    test('...send message, get proper ACK', async () => {
+
+      const server = new Server({bindAddress: '0.0.0.0'})
+      const IB_ADT = server.createInbound({port: 3000}, async (req, _res) => {
+        if (req.isMessage()) {
+          const messageReq = req.getMessage()
+          expect(messageReq.get('MSH.12').toString()).toBe('2.7')
+        }
       })
 
-      listener.on('client.connect', () => {
-        console.log('Client Connected')
+      IB_ADT.on('client.connect', (socket: Socket) => {
+        console.log(`Client Connected to Server from Address ${socket.remoteAddress}`)
       })
 
-      const client = new Client({ hostname: '0.0.0.0'})
-      const adt_port = client.connectToListener({ port: LISTEN_PORT }, async (var1: any, var2: any) => {
-        console.log(var1)
-        console.log(var2)
+      await sleep(1)
+
+      const client = new Client({host: '0.0.0.0'})
+      const OB_ADT = client.createOutbound({ port: 3000 }, async () => {
+        console.log('Test 1 2 3')
       })
+
+      OB_ADT.on('connect', () => {
+        console.log(`Server Outbound Connected to ${client.getHost()}:${OB_ADT.getPort()} `)
+      })
+
+      OB_ADT.on('data', (data: any) => {
+        console.log(`Response back from the IB: ${data.toString()}`)
+      })
+
+      await sleep(1)
 
       let message = new Message({
         messageHeader: {
@@ -195,23 +212,18 @@ describe('node hl7 server', () => {
             msh_9_1: "ADT",
             msh_9_2: "A01"
           },
-          msh_10: "HELLO_THERE"
+          msh_10: 'CONTROL_ID'
         }
       })
 
-      // send the message
-      await adt_port.sendMessage(message)
+      await OB_ADT.sendMessage(message)
 
-      // close
-      await listener.close()
+      await sleep(10)
+
+      await OB_ADT.close()
+      await IB_ADT.close()
 
     })
-
-  })
-
-  describe('end to end testing', () => {
-
-    test.todo('... send HL7 and get response back')
 
   })
 

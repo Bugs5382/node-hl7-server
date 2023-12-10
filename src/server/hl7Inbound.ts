@@ -1,33 +1,30 @@
 import EventEmitter from 'events'
 import net, { Socket } from 'net'
 import tls from 'tls'
-import { CR, FS } from '../utils/constants.js'
 import { ListenerOptions, normalizeListenerOptions } from '../utils/normalize.js'
-import { ListenerResponse } from './modules/listenerResponse.js'
-import { ListenerRequest } from './modules/listenerRequest.js'
+import { InboundRequest } from './modules/inboundRequest'
+import { SendResponse } from './modules/sendResponse'
 import { Server } from './server'
 
-export type ListenerHandler = (req: ListenerRequest, res: ListenerResponse) => Promise<void>
+export type InboundHandler = (req: InboundRequest, res: SendResponse) => Promise<void>
 
 /**
  * Listener Class
  * @since 1.0.0
  */
-export class Listener extends EventEmitter {
+export class Hl7Inbound extends EventEmitter {
   /** @internal */
   _main: Server
   /** @internal */
   _opt: ReturnType<typeof normalizeListenerOptions>
   /** @internal */
-  _server: net.Server | tls.Server | undefined
+  private readonly _server: net.Server | tls.Server
   /** @internal */
-  _sockets: Socket[]
+  private readonly _sockets: Socket[]
   /** @internal */
-  _connected: boolean
-  /** @internal */
-  _handler: any
+  private readonly _handler: (req: InboundRequest, res: SendResponse) => void
 
-  constructor (server: Server, props: ListenerOptions, handler: ListenerHandler) {
+  constructor (server: Server, props: ListenerOptions, handler: InboundHandler) {
     super()
 
     this._main = server
@@ -35,7 +32,6 @@ export class Listener extends EventEmitter {
     // process listener options
     this._opt = normalizeListenerOptions(props)
 
-    this._connected = false
     this._sockets = []
 
     this._handler = handler
@@ -61,55 +57,50 @@ export class Listener extends EventEmitter {
   }
 
   /** @internal */
-  private _listen (): net.Server {
-    const encoding = this._opt?.encoding
+  private _listen (): net.Server | tls.Server {
     const port = this._opt.port
     const bindAddress = this._main._opt.bindAddress
     const ipv6 = this._main._opt.ipv6
 
-    const server = net.createServer(socket => this._onTcpClientConnected(socket, encoding))
-
-    server.on('connection', socket => {
-      this.emit('connection', socket)
-    })
+    const server = net.createServer(socket => this._onTcpClientConnected(socket))
 
     server.on('error', err => {
       this.emit('error', err)
     })
 
     server.listen({ port, ipv6Only: ipv6, hostname: bindAddress }, () => {
-      this._connected = true
+
     })
 
     return server
   }
 
   /** @internal */
-  private _onTcpClientConnected (socket: Socket, encoding: BufferEncoding): void {
+  private _onTcpClientConnected (socket: Socket): void {
     // add socked connection to array
     this._sockets.push(socket)
 
     // no delay in processing the message
     socket.setNoDelay(true)
 
-    // force the message to be nothing to start
-    let message: string = ''
+    // set encoding
+    socket.setEncoding(this._opt.encoding)
 
-    socket.on('data', (data: any) => {
+    socket.on('error', () => {
+      this._closeSocket(socket)
+    })
+
+    socket.on('data', data => {
       try {
-        message = `${message}${data.toString()}`
-        if (message.substring(message.length - 2, message.length) === FS + CR) {
-          const cleanHL7 = message.substring(1, message.length - 2)
-          const ack = this._createAckMessage(cleanHL7)
-          const req = new ListenerRequest(cleanHL7)
-          const res = new ListenerResponse(socket, ack)
-          this._handler(null, req, res)
-          message = ''
-        }
+        const cleanHL7 = data.toString()
+        // const ack = this._createAckMessage(cleanHL7)
+        const req = new InboundRequest(cleanHL7)
+        const res = new SendResponse(socket, 'test')
+        this._handler(req, res)
       } catch (err) {
         this.emit('data.error', err)
       }
-    }).setEncoding(encoding)
+    })
 
     socket.on('error', err => {
       this.emit('client.error', err)
@@ -122,13 +113,17 @@ export class Listener extends EventEmitter {
       this._closeSocket(socket)
     })
 
+    socket.pipe(socket)
+
     this.emit('client.connect', socket)
   }
 
-  /** @internal */
+  /*  // @ts-ignore
+  // @ts-ignore
+  /!** @internal *!/
   private _createAckMessage (cleanHL7: string): string {
     return cleanHL7
-  }
+  } */
 
   /** @internal */
   private _closeSocket (socket: Socket): void {
