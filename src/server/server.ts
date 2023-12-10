@@ -1,6 +1,6 @@
 import EventEmitter from 'events'
 import { Listener, ListenerHandler } from './listener.js'
-import { ServerOptions, normalizeServerOptions, ListenerOptions } from './normalize.js'
+import { ServerOptions, normalizeServerOptions, ListenerOptions } from '../utils/normalize.js'
 
 export class Server extends EventEmitter {
   /** @internal */
@@ -8,7 +8,6 @@ export class Server extends EventEmitter {
 
   constructor (props?: ServerOptions) {
     super()
-
     this._opt = normalizeServerOptions(props)
   }
 

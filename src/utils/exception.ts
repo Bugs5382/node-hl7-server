@@ -1,8 +1,8 @@
 /** Base Error Class */
 class HL7Error extends Error {
-  code: string
+  code: number
   /** @internal */
-  constructor (code: string, message: string) {
+  constructor (code: number, message: string) {
     super(message)
     this.name = 'HL7Error'
     this.code = code
