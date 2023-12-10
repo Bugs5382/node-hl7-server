@@ -1,38 +1,50 @@
 import EventEmitter from 'events'
 import net, { Socket } from 'net'
+import tls from 'tls'
+import { Batch, isBatch, isFile, Message } from '../../node-hl7-client/src'
 import { CR, FS, VT } from './constants.js'
 import { normalizeListenerOptions, ListenerOptions } from './normalize.js'
 import { Server } from './server.js'
 
 export type ListenerHandler = (req: ListenerRequest, res: ListenerResponse) => Promise<void>
 
+/**
+ * Listener Request
+ * @since 1.0.0
+ */
 export class ListenerRequest {
-  _msg: string
-  // @ts-expect-error
-  _parsed: string
+  /** @internal */
+  _isBatch: boolean
+  /** @internal */
+  _isFile: boolean
+  /** @internal */
+  _message: Message | Message[] | undefined
 
-  _type: any
-  _event: any
+  constructor (data: any) {
+    this._isFile = false
+    this._isBatch = false
 
-  constructor (msg: any) {
-    //  parse the raw message (msg)
-    // @ts-expect-error
-    let hl7
-    try {
-      // hl7 = new Parser(msg)
-      // hl7.transform();
-    } catch (err) {
-      if (err) throw err
+    let parser: Batch | Message
+    if (isBatch(data)) {
+      // set request as a batch
+      this._isBatch = true
+      // parser the batch
+      parser = new Batch({ text: data })
+      // load the messages
+      this._message = parser.messages()
+    } else if (isFile(data)) {
+      // * noop, not created yet * //
+    } else {
+      // parse the message load the message for use
+      this._message = new Message({ text: data })
     }
-    this._msg = msg
-    /*
-    this._type = hl7.get('MSH.9.1');
-    this._event = hl7.get('MSH.9.2');
-    this._parsed = hl7.transformed;
-    */
   }
 }
 
+/**
+ * Listener Response
+ * @since 1.0.0
+ */
 export class ListenerResponse {
   /** @internal */
   _ack: any
@@ -45,18 +57,22 @@ export class ListenerResponse {
     this._ack = ack
     this._socket = socket
     this._end = function () {
-      socket.write(`${VT} ${this._ack.toString()}${FS}${CR}`)
+      socket.write(`${VT}${this._ack.toString()}${FS}${CR}`)
     }
   }
 }
 
+/**
+ * Listener Class
+ * @since 1.0.0
+ */
 export class Listener extends EventEmitter {
   /** @internal */
   _main: Server
   /** @internal */
   _opt: ReturnType<typeof normalizeListenerOptions>
   /** @internal */
-  _server: net.Server | undefined
+  _server: net.Server | tls.Server | undefined
   /** @internal */
   _sockets: Socket[]
   /** @internal */
@@ -85,22 +101,20 @@ export class Listener extends EventEmitter {
   /** Close Listener Instance.
    * This be called for each listener, but if the server instance is closed shut down, this will also fire off.
    * @since 1.0.0 */
-  async close(): Promise<boolean> {
+  async close (): Promise<boolean> {
+    this._sockets.forEach((socket) => {
+      socket.destroy()
+    })
 
-    for (const i in this._sockets) {
-      this._sockets[i].destroy(); // tell the client we are going to be closing up shop
-    }
+    this._server?.close(() => {
+      this._server?.unref()
+    })
 
-    this._server?.close(()=> {
-      this._server?.unref();
-    });
-
-    return  true
-
+    return true
   }
 
   /** @internal */
-  private _listen () {
+  private _listen (): net.Server {
     const encoding = this._opt?.encoding
     const port = this._opt.port
     const bindAddress = this._main._opt.bindAddress
@@ -124,7 +138,7 @@ export class Listener extends EventEmitter {
   }
 
   /** @internal */
-  private _onTcpClientConnected (socket: Socket, encoding: BufferEncoding) {
+  private _onTcpClientConnected (socket: Socket, encoding: BufferEncoding): void {
     // add socked connection to array
     this._sockets.push(socket)
 
@@ -165,12 +179,12 @@ export class Listener extends EventEmitter {
   }
 
   /** @internal */
-  private _createAckMessage (cleanHL7: string) {
+  private _createAckMessage (cleanHL7: string): string {
     return cleanHL7
   }
 
   /** @internal */
-  private _closeSocket (socket: Socket) {
+  private _closeSocket (socket: Socket): void {
     socket.destroy()
     this._sockets.splice(this._sockets.indexOf(socket), 1)
   }

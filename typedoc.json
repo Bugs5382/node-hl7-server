@@ -1,8 +1,20 @@
 {
   "entryPoints": ["src/index.ts"],
   "excludeExternals": true,
+  "excludeInternal": true,
   "includeVersion": false,
   "githubPages": false,
   "out": "./docs",
-  "name": "Node HL7 Server"
+  "name": "Node HL7 Server",
+  "navigationLinks": {
+    "GitHub": "https://github.com/Bugs5382/node-hl7-server"
+  },
+  "visibilityFilters": {
+    "protected": true,
+    "private": false,
+    "inherited": false,
+    "external": true,
+    "@alpha": false,
+    "@beta": false
+  }
 }

@@ -3,6 +3,7 @@ on:
   push:
     branches: [ main ]
   pull_request:
+    branches: [ 'develop', 'feature/*' ]
 
 jobs:
   Test:
@@ -20,27 +21,27 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install Dependencies
         run: npm install --ignore-scripts
-#      - name: Run Unit Tests
-#        run: npm run test:ci
+      - name: Run Unit Tests
+        run: npm run test:ci
       - name: Release Drafter
         uses: release-drafter/release-drafter@v5.9.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#  Release:
-#    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-#    runs-on: ubuntu-latest
-#    needs: [ test ]
-#    steps:
-#      - uses: actions/checkout@v3
-#        with:
-#          persist-credentials: false
-#      - name: Use Node.js
-#        uses: actions/setup-node@v3
-#        with:
-#          node-version: 'lts/*'
-#      - run: npm install
-#      - name: Semantic Release
-#        run: npm run semantic-release
-#        env:
-#          GITHUB_TOKEN:  ${{ secrets.GH_SECRET }}
-#          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  Release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: [ test ]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 'lts/*'
+      - run: npm install
+      - name: Semantic Release
+        run: npm run semantic-release
+        env:
+          GITHUB_TOKEN:  ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

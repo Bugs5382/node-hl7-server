@@ -10,15 +10,13 @@ class HL7Error extends Error {
 }
 
 /** Server Error */
-class HL7ServerError extends HL7Error {
+export class HL7ServerError extends HL7Error {
   /** @internal */
   name = 'HL7ServerError'
 }
 
 /** Listener Error */
-class HL7ListenerError extends HL7Error {
+export class HL7ListenerError extends HL7Error {
   /** @internal */
   name = 'HL7ListenerError'
 }
-
-export { HL7ListenerError, HL7ServerError, HL7Error }

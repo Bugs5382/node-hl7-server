@@ -118,7 +118,7 @@ describe('node hl7 server', () => {
         const server = new Server()
         server.createListener({ name: "$#@!sdfe-`", port: 65354}, async () => {})
       } catch (err: any) {
-        expect(err.message).toContain('name must not contain these characters')
+        expect(err.message).toContain(`name must not contain certain characters: \`!@#$%^&*()+\\-=\\[\\]{};':\"\\\\|,.<>\\/?~.`)
       }
     })
 
