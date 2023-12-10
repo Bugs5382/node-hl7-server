@@ -1,6 +1,8 @@
 import { TcpSocketConnectOpts } from 'node:net'
 import type { ConnectionOptions as TLSOptions } from 'node:tls'
-import { assertNumber, randomString, validIPv4, validIPv6 } from './utils.js'
+import { assertNumber, validIPv4, validIPv6 } from '../../../node-hl7-client/src'
+import { HL7ListenerError, HL7ServerError } from './exception'
+import { randomString } from './utils'
 
 const DEFAULT_SERVER_OPTS = {
   bindAddress: '0.0.0.0',
@@ -58,19 +60,19 @@ export function normalizeServerOptions (raw?: ServerOptions): ServerOptions {
   const props: any = { ...DEFAULT_SERVER_OPTS, ...raw }
 
   if (props.ipv4 && props.ipv6) {
-    throw new Error('ipv4 and ipv6 both can\'t be set to be exclusive.')
+    throw new HL7ServerError(500, 'ipv4 and ipv6 both can\'t be set to be exclusive.')
   }
 
   if (typeof props.bindAddress !== 'string') {
-    throw new Error('bindAddress is not valid string.')
+    throw new HL7ServerError(500, 'bindAddress is not valid string.')
   }
 
   if (typeof props.bindAddress !== 'undefined' && props.ipv6 && !validIPv6(props.bindAddress)) {
-    throw new Error('bindAddress is an invalid ipv6 address.')
+    throw new HL7ServerError(500, 'bindAddress is an invalid ipv6 address.')
   }
 
   if (typeof props.bindAddress !== 'undefined' && !props.ipv6 && !validIPv4(props.bindAddress)) {
-    throw new Error('bindAddress is an invalid ipv4 address.')
+    throw new HL7ServerError(500, 'bindAddress is an invalid ipv4 address.')
   }
 
   return props
@@ -86,16 +88,16 @@ export function normalizeListenerOptions (raw?: ListenerOptions): ValidatedOptio
     props.name = randomString()
   } else {
     if (nameFormat.test(props.name)) {
-      throw new Error('name must not contain certain characters: `!@#$%^&*()+\\-=\\[\\]{};\':"\\\\|,.<>\\/?~.')
+      throw new HL7ListenerError(500, 'name must not contain certain characters: `!@#$%^&*()+\\-=\\[\\]{};\':"\\\\|,.<>\\/?~.')
     }
   }
 
   if (typeof props.port === 'undefined') {
-    throw new Error('port is not defined.')
+    throw new HL7ListenerError(404, 'port is not defined.')
   }
 
   if (typeof props.port !== 'number') {
-    throw new Error('port is not valid number.')
+    throw new HL7ListenerError(500, 'port is not valid number.')
   }
 
   assertNumber(props, 'port', 0, 65353)

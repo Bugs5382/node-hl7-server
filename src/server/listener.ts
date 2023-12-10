@@ -1,66 +1,13 @@
 import EventEmitter from 'events'
 import net, { Socket } from 'net'
 import tls from 'tls'
-import { Batch, isBatch, isFile, Message } from '../../node-hl7-client/src'
-import { CR, FS, VT } from './constants.js'
-import { normalizeListenerOptions, ListenerOptions } from './normalize.js'
-import { Server } from './server.js'
+import { CR, FS } from '../utils/constants.js'
+import { ListenerOptions, normalizeListenerOptions } from '../utils/normalize.js'
+import { ListenerResponse } from './modules/listenerResponse.js'
+import { ListenerRequest } from './modules/listenerRequest.js'
+import { Server } from './server'
 
 export type ListenerHandler = (req: ListenerRequest, res: ListenerResponse) => Promise<void>
-
-/**
- * Listener Request
- * @since 1.0.0
- */
-export class ListenerRequest {
-  /** @internal */
-  _isBatch: boolean
-  /** @internal */
-  _isFile: boolean
-  /** @internal */
-  _message: Message | Message[] | undefined
-
-  constructor (data: any) {
-    this._isFile = false
-    this._isBatch = false
-
-    let parser: Batch | Message
-    if (isBatch(data)) {
-      // set request as a batch
-      this._isBatch = true
-      // parser the batch
-      parser = new Batch({ text: data })
-      // load the messages
-      this._message = parser.messages()
-    } else if (isFile(data)) {
-      // * noop, not created yet * //
-    } else {
-      // parse the message load the message for use
-      this._message = new Message({ text: data })
-    }
-  }
-}
-
-/**
- * Listener Response
- * @since 1.0.0
- */
-export class ListenerResponse {
-  /** @internal */
-  _ack: any
-  /** @internal */
-  _end: () => void
-  /** @internal */
-  _socket: Socket
-
-  constructor (socket: Socket, ack: any) {
-    this._ack = ack
-    this._socket = socket
-    this._end = function () {
-      socket.write(`${VT}${this._ack.toString()}${FS}${CR}`)
-    }
-  }
-}
 
 /**
  * Listener Class

@@ -1,5 +1,7 @@
 import portfinder from 'portfinder'
 import tcpPortUsed from 'tcp-port-used'
+import {Client} from "../../node-hl7-client/src";
+import {Message} from "../../node-hl7-client/src";
 import { Server } from '../src'
 import {expectEvent} from "./__utils__/utils";
 
@@ -134,7 +136,7 @@ describe('node hl7 server', () => {
       })
     })
 
-    test('... listen on a randomized port', async () => {
+    test('...listen on a randomized port', async () => {
       const server = new Server()
       const listener = server.createListener({ port: LISTEN_PORT}, async () => {})
       const usedCheck = await tcpPortUsed.check(LISTEN_PORT, '0.0.0.0')
@@ -145,7 +147,7 @@ describe('node hl7 server', () => {
 
     })
 
-    test('... should not be able to listen on the same port', async () => {
+    test('...should not be able to listen on the same port', async () => {
       const server = new Server()
       const listenerOne = server.createListener({ port: LISTEN_PORT}, async () => {})
       const listenerTwo = server.createListener({ port: LISTEN_PORT}, async () => {})
@@ -156,7 +158,7 @@ describe('node hl7 server', () => {
 
     })
 
-    test('... two different ports', async () => {
+    test('...two different ports', async () => {
       const server = new Server()
       const listenerOne = server.createListener({ port: LISTEN_PORT}, async () => {})
       const listenerTwo = server.createListener({ port: await portfinder.getPortPromise({
@@ -168,6 +170,43 @@ describe('node hl7 server', () => {
       await listenerTwo.close()
 
     })
+
+    test('...basic client connect to server', async () => {
+
+      const server = new Server()
+      const listener = server.createListener({ port: LISTEN_PORT}, async (data: any) => {
+        console.log('We did it.')
+        console.log(data)
+      })
+
+      listener.on('client.connect', () => {
+        console.log('Client Connected')
+      })
+
+      const client = new Client({ hostname: '0.0.0.0'})
+      const adt_port = client.connectToListener({ port: LISTEN_PORT }, async (var1: any, var2: any) => {
+        console.log(var1)
+        console.log(var2)
+      })
+
+      let message = new Message({
+        messageHeader: {
+          msh_9: {
+            msh_9_1: "ADT",
+            msh_9_2: "A01"
+          },
+          msh_10: "HELLO_THERE"
+        }
+      })
+
+      // send the message
+      await adt_port.sendMessage(message)
+
+      // close
+      await listener.close()
+
+    })
+
   })
 
   describe('end to end testing', () => {
