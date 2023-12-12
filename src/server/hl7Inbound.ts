@@ -104,6 +104,7 @@ export class Hl7Inbound extends EventEmitter {
           parser = new Batch({ text: message })
           // load the messages
           const allMessage = parser.messages()
+          // loop messages
           allMessage.forEach((message: Message) => {
             const messageParsed = new Message({ text: message.toString() })
             const req = new InboundRequest(messageParsed)
@@ -113,8 +114,11 @@ export class Hl7Inbound extends EventEmitter {
         } else if (isFile(data.toString())) {
           // * noop, not created yet * //
         } else {
+          // parse the message
           const parser = new Message({ text: message })
+          // request
           const req = new InboundRequest(parser)
+          // response
           const res = new SendResponse(socket, this._createAckMessage(parser))
           this._handler(req, res)
         }
@@ -133,8 +137,6 @@ export class Hl7Inbound extends EventEmitter {
       this.emit('client.close', hadError)
       this._closeSocket(socket)
     })
-
-    socket.pipe(socket)
 
     this.emit('client.connect', socket)
   }
