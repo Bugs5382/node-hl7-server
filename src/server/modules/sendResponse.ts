@@ -1,5 +1,5 @@
 import { Socket } from 'net'
-import {Message} from "../../../../node-hl7-client/src";
+import { Message } from '../../../../node-hl7-client/src'
 
 /**
  * Send Response
@@ -18,8 +18,7 @@ export class SendResponse {
    * Get Ack Message Object
    * @since 1.0.0
    */
-  getAckMessage(): Message {
+  getAckMessage (): Message {
     return this._ack
   }
-
 }

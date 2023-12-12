@@ -180,8 +180,6 @@ describe('node hl7 server', () => {
       const IB_ADT = server.createInbound({port: 3000}, async (req, res) => {
         const messageReq = req.getMessage()
         const messageRes = res.getAckMessage()
-        //console.log(messageReq.toString().replace("\r", "\n"))
-        //console.log(messageRes.toString().replace("\r", "\n"))
         expect(messageRes.get('MSA.1').toString()).toBe('AA')
         expect(messageReq.get('MSH.12').toString()).toBe('2.7')
       })
@@ -189,8 +187,6 @@ describe('node hl7 server', () => {
       await sleep(5)
 
       const client = new Client({host: '0.0.0.0'})
-
-
 
       const OB_ADT = client.createOutbound({ port: 3000 }, async (res) => {
         expect(res.toString()).not.toContain('ADT^A01^ADT_A01')
@@ -227,20 +223,12 @@ describe('node hl7 server', () => {
         expect(messageReq.get('MSH.12').toString()).toBe('2.7')
       })
 
-      // IB_ADT.on('client.connect', (socket: Socket) => {
-      //   console.log(`Client Connected to Server from Address ${socket.remoteAddress}`)
-      // })
-
       await sleep(2)
 
       const client = new Client({host: '0.0.0.0'})
       const OB_ADT = client.createOutbound({ port: 3000 }, async (res) => {
         console.log(res)
       })
-
-      // OB_ADT.on('connect', () => {
-      //   console.log(`Server Outbound Connected to ${client.getHost()}:${OB_ADT.getPort()} `)
-      // })
 
       await sleep(2)
 

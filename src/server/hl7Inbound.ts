@@ -1,10 +1,10 @@
 import EventEmitter from 'events'
 import net, { Socket } from 'net'
 import tls from 'tls'
-import {Batch, Message, isBatch, isFile, createHL7Date} from "../../../node-hl7-client/src";
+import { Batch, Message, isBatch, isFile, createHL7Date } from '../../../node-hl7-client/src'
 import { ListenerOptions, normalizeListenerOptions } from '../utils/normalize.js'
 import { InboundRequest } from './modules/inboundRequest'
-import {Parser} from "./modules/parser";
+import { Parser } from './modules/parser'
 import { SendResponse } from './modules/sendResponse'
 import { Server } from './server'
 
@@ -74,7 +74,6 @@ export class Hl7Inbound extends EventEmitter {
 
   /** @internal */
   private _onTcpClientConnected (socket: Socket): void {
-
     // set message
     let message: string = ''
 
@@ -88,17 +87,17 @@ export class Hl7Inbound extends EventEmitter {
     socket.setEncoding(this._opt.encoding)
 
     // custom parser
-    const parser = new Parser();
+    const parser = new Parser()
 
     // process sock though custom parser
-    socket.pipe(parser);
+    socket.pipe(parser)
 
     parser.on('data', data => {
       try {
         // parser either is batch or a message
         let parser: Batch | Message
         // set message
-        message += data.toString()
+        message = data.toString()
         if (isBatch(message)) {
           // parser the batch
           parser = new Batch({ text: message })
@@ -141,33 +140,30 @@ export class Hl7Inbound extends EventEmitter {
     this.emit('client.connect', socket)
   }
 
-
   /** @internal */
   private _createAckMessage (message: Message): Message {
-
-    let ackMessage = new Message({
+    const ackMessage = new Message({
       messageHeader: {
         msh_9: {
-          msh_9_1: `ACK`,
+          msh_9_1: 'ACK',
           msh_9_2: message.get('MSH.9.2').toString()
         },
         msh_10: `ACK${createHL7Date(new Date())}`
       }
     })
 
-    ackMessage.set("MSH.3", message.get('MSH.5').toRaw());
-    ackMessage.set("MSH.4", message.get('MSH.6').toRaw());
-    ackMessage.set("MSH.5", message.get('MSH.3').toRaw());
-    ackMessage.set("MSH.6", message.get('MSH.4').toRaw());
-    ackMessage.set("MSH.11", message.get('MSH.11').toRaw())
+    ackMessage.set('MSH.3', message.get('MSH.5').toRaw())
+    ackMessage.set('MSH.4', message.get('MSH.6').toRaw())
+    ackMessage.set('MSH.5', message.get('MSH.3').toRaw())
+    ackMessage.set('MSH.6', message.get('MSH.4').toRaw())
+    ackMessage.set('MSH.11', message.get('MSH.11').toRaw())
 
-    let segment = ackMessage.addSegment('MSA')
+    const segment = ackMessage.addSegment('MSA')
 
     segment.set('1', 'AA')
     segment.set('2', message.get('MSH.10').toString())
 
     return ackMessage
-
   }
 
   /** @internal */

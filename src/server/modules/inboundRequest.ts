@@ -14,18 +14,17 @@ export class InboundRequest {
    * @param data
    */
   constructor (data: Message) {
-      this._message = data
+    this._message = data
   }
 
-  /**'
+  /** '
    * Get Stored Message
    * @since 1.0.0
    */
   getMessage (): Message {
     if (typeof this._message !== 'undefined') {
-      return this._message as Message
+      return this._message
     }
     throw new HL7ListenerError(500, 'Message is not defined.')
   }
-
 }
