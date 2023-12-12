@@ -144,10 +144,8 @@ export class Hl7Inbound extends EventEmitter {
   private _createAckMessage (message: Message): Message {
     const ackMessage = new Message({
       messageHeader: {
-        msh_9: {
-          msh_9_1: 'ACK',
-          msh_9_2: message.get('MSH.9.2').toString()
-        },
+        msh_9_1: 'ACK',
+        msh_9_2: message.get('MSH.9.2').toString(),
         msh_10: `ACK${createHL7Date(new Date())}`
       }
     })

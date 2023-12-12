@@ -196,10 +196,8 @@ describe('node hl7 server', () => {
 
       let message = new Message({
         messageHeader: {
-          msh_9: {
-            msh_9_1: "ADT",
-            msh_9_2: "A01"
-          },
+          msh_9_1: "ADT",
+          msh_9_2: "A01",
           msh_10: 'CONTROL_ID'
         }
       })
@@ -234,10 +232,8 @@ describe('node hl7 server', () => {
 
       let message = new Message({
         messageHeader: {
-          msh_9: {
-            msh_9_1: "ADT",
-            msh_9_2: "A01"
-          },
+          msh_9_1: "ADT",
+          msh_9_2: "A01",
           msh_10: 'CONTROL_ID'
         }
       })
