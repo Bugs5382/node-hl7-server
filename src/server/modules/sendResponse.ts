@@ -1,22 +1,25 @@
 import { Socket } from 'net'
+import {Message} from "../../../../node-hl7-client/src";
 
 /**
- * Listener Response
+ * Send Response
  * @since 1.0.0
  */
 export class SendResponse {
   /** @internal */
-  _ack: any
-  /** @internal */
-  _end: () => void
-  /** @internal */
-  _socket: Socket
+  private readonly _ack: Message
 
-  constructor (socket: Socket, ack: any) {
+  constructor (socket: Socket, ack: Message) {
     this._ack = ack
-    this._socket = socket
-    this._end = function () {
-      socket.write(Buffer.from('This is a test.'))
-    }
+    socket.write(Buffer.from(ack.toString()))
   }
+
+  /**
+   * Get Ack Message Object
+   * @since 1.0.0
+   */
+  getAckMessage(): Message {
+    return this._ack
+  }
+
 }
