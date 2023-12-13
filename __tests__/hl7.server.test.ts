@@ -1,8 +1,7 @@
 import portfinder from 'portfinder'
 import tcpPortUsed from 'tcp-port-used'
-import {Client, Message} from "../../node-hl7-client/src";
+import {Client, expectEvent, Message, sleep} from "../../node-hl7-client/src";
 import { Server } from '../src'
-import {expectEvent, sleep} from "./__utils__/utils";
 
 describe('node hl7 server', () => {
 
