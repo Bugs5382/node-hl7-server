@@ -22,7 +22,7 @@ export class Hl7Inbound extends EventEmitter {
   /** @internal */
   _opt: ReturnType<typeof normalizeListenerOptions>
   /** @internal */
-  private readonly _server: net.Server | tls.Server
+  private readonly _socket: net.Server | tls.Server
   /** @internal */
   private readonly _sockets: Socket[]
 
@@ -35,7 +35,7 @@ export class Hl7Inbound extends EventEmitter {
 
     this._listen = this._listen.bind(this)
     this._onTcpClientConnected = this._onTcpClientConnected.bind(this)
-    this._server = this._listen()
+    this._socket = this._listen()
   }
 
   /** Close Listener Instance.
@@ -46,8 +46,8 @@ export class Hl7Inbound extends EventEmitter {
       socket.destroy()
     })
 
-    this._server?.close(() => {
-      this._server?.unref()
+    this._socket?.close(() => {
+      this._socket?.unref()
     })
 
     return true
@@ -59,17 +59,17 @@ export class Hl7Inbound extends EventEmitter {
     const bindAddress = this._main._opt.bindAddress
     const ipv6 = this._main._opt.ipv6
 
-    const server = net.createServer(socket => this._onTcpClientConnected(socket))
+    const socket = net.createServer(socket => this._onTcpClientConnected(socket))
 
-    server.on('error', err => {
+    socket.on('error', err => {
       this.emit('error', err)
     })
 
-    server.listen({ port, ipv6Only: ipv6, hostname: bindAddress }, () => {
-
+    socket.listen({ port, ipv6Only: ipv6, hostname: bindAddress }, () => {
+      this.emit('listen', socket)
     })
 
-    return server
+    return socket
   }
 
   /** @internal */
