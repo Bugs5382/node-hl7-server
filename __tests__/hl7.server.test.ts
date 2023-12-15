@@ -264,7 +264,6 @@ describe('node hl7 server', () => {
         await sleep(5)
 
         const client = new Client({host: '0.0.0.0', tls: { rejectUnauthorized: false }})
-
         const OB_ADT = client.createOutbound({ port: LISTEN_PORT }, async (res) => {
           expect(res.toString()).not.toContain('ADT^A01^ADT_A01')
         })
