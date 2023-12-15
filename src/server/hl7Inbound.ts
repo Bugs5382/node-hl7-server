@@ -55,11 +55,17 @@ export class Hl7Inbound extends EventEmitter {
 
   /** @internal */
   private _listen (): net.Server | tls.Server {
+    let socket: net.Server | tls.Server
     const port = this._opt.port
     const bindAddress = this._main._opt.bindAddress
     const ipv6 = this._main._opt.ipv6
 
-    const socket = net.createServer(socket => this._onTcpClientConnected(socket))
+    if (typeof this._main._opt.tls !== 'undefined') {
+      const {key, cert, requestCert, ca} = this._main._opt.tls
+      socket = tls.createServer({key, cert, requestCert, ca},socket => this._onTcpClientConnected(socket))
+    } else {
+      socket = net.createServer(socket => this._onTcpClientConnected(socket))
+    }
 
     socket.on('error', err => {
       this.emit('error', err)

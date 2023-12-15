@@ -29,7 +29,7 @@ export interface ServerOptions {
   socket?: TcpSocketConnectOpts
   /** Enable TLS, or set TLS specific options like overriding the CA for
    * self-signed certificates. */
-  tls?: boolean | TLSOptions
+  tls?: TLSOptions
 }
 
 export interface ListenerOptions {
