@@ -2,6 +2,7 @@
 .github
 .idea
 src
+certs
 __tests__
 coverage
 
