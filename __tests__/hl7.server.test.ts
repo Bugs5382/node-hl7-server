@@ -173,14 +173,15 @@ describe('node hl7 server', () => {
 
     test('...use tls', async () => {
 
-      const server = new Server({
-        tls:
-          {
-            key: fs.readFileSync(path.join('certs/', 'server-key.pem')),
-            cert: fs.readFileSync(path.join('certs/', 'server-crt.pem')),
-            rejectUnauthorized: false
-          }
-      })
+      const server = new Server(
+        {
+          tls:
+            {
+              key: fs.readFileSync(path.join('certs/', 'server-key.pem')),
+              cert: fs.readFileSync(path.join('certs/', 'server-crt.pem')),
+              rejectUnauthorized: false
+            }
+        })
       const listener = server.createInbound({ port: LISTEN_PORT}, async () => {})
 
       const usedCheck = await tcpPortUsed.check(LISTEN_PORT, '0.0.0.0')
@@ -194,40 +195,98 @@ describe('node hl7 server', () => {
 
   describe('end to end tests', () => {
 
-    test('...send message, get proper ACK', async () => {
+    describe('...send message, get proper ACK', () => {
 
-      const server = new Server({bindAddress: '0.0.0.0'})
-      const IB_ADT = server.createInbound({port: 3000}, async (req, res) => {
-        const messageReq = req.getMessage()
-        const messageRes = res.getAckMessage()
-        expect(messageRes.get('MSA.1').toString()).toBe('AA')
-        expect(messageReq.get('MSH.12').toString()).toBe('2.7')
+      let LISTEN_PORT: number
+      beforeEach(async () => {
+        LISTEN_PORT = await portfinder.getPortPromise({
+          port: 3000,
+          stopPort: 65353
+        })
       })
 
-      await sleep(5)
+      test('...no tls', async () => {
 
-      const client = new Client({host: '0.0.0.0'})
+        const server = new Server({bindAddress: '0.0.0.0'})
+        const IB_ADT = server.createInbound({port: LISTEN_PORT}, async (req, res) => {
+          const messageReq = req.getMessage()
+          const messageRes = res.getAckMessage()
+          expect(messageRes.get('MSA.1').toString()).toBe('AA')
+          expect(messageReq.get('MSH.12').toString()).toBe('2.7')
+        })
 
-      const OB_ADT = client.createOutbound({ port: 3000 }, async (res) => {
-        expect(res.toString()).not.toContain('ADT^A01^ADT_A01')
+        await sleep(5)
+
+        const client = new Client({host: '0.0.0.0'})
+
+        const OB_ADT = client.createOutbound({ port: LISTEN_PORT }, async (res) => {
+          expect(res.toString()).not.toContain('ADT^A01^ADT_A01')
+        })
+
+        await sleep(5)
+
+        let message = new Message({
+          messageHeader: {
+            msh_9_1: "ADT",
+            msh_9_2: "A01",
+            msh_10: 'CONTROL_ID'
+          }
+        })
+
+        await OB_ADT.sendMessage(message)
+
+        await sleep(10)
+
+        await OB_ADT.close()
+        await IB_ADT.close()
+
       })
 
-      await sleep(5)
+      test('...tls', async () => {
 
-      let message = new Message({
-        messageHeader: {
-          msh_9_1: "ADT",
-          msh_9_2: "A01",
-          msh_10: 'CONTROL_ID'
-        }
+        const server = new Server(
+          {
+            bindAddress: '0.0.0.0',
+            tls:
+              {
+                key: fs.readFileSync(path.join('certs/', 'server-key.pem')),
+                cert: fs.readFileSync(path.join('certs/', 'server-crt.pem')),
+                rejectUnauthorized: false
+              }
+          })
+        const IB_ADT = server.createInbound({port: LISTEN_PORT}, async (req, res) => {
+          const messageReq = req.getMessage()
+          const messageRes = res.getAckMessage()
+          expect(messageRes.get('MSA.1').toString()).toBe('AA')
+          expect(messageReq.get('MSH.12').toString()).toBe('2.7')
+        })
+
+        await sleep(5)
+
+        const client = new Client({host: '0.0.0.0', tls: { rejectUnauthorized: false }})
+
+        const OB_ADT = client.createOutbound({ port: LISTEN_PORT }, async (res) => {
+          expect(res.toString()).not.toContain('ADT^A01^ADT_A01')
+        })
+
+        await sleep(5)
+
+        let message = new Message({
+          messageHeader: {
+            msh_9_1: "ADT",
+            msh_9_2: "A01",
+            msh_10: 'CONTROL_ID'
+          }
+        })
+
+        await OB_ADT.sendMessage(message)
+
+        await sleep(10)
+
+        await OB_ADT.close()
+        await IB_ADT.close()
+
       })
-
-      await OB_ADT.sendMessage(message)
-
-      await sleep(10)
-
-      await OB_ADT.close()
-      await IB_ADT.close()
 
     })
 
