@@ -8,11 +8,25 @@ import { Parser } from './modules/parser.js'
 import { SendResponse } from './modules/sendResponse.js'
 import { Server } from './server.js'
 
+/**
+ * Inbound Handler
+ * @description The handler that will handle the user parsing a received message by the client to the server.
+ * @since 1.0.0
+ * @example
+ * In this example, we are processing the results in an async handler.
+ *
+ *  const IB_ADT = server.createInbound({port: 3000}, async (req, res) => {
+ *    const messageReq = req.getMessage()
+ *    const messageRes = res.getAckMessage()
+ *  })
+ *
+ */
 export type InboundHandler = (req: InboundRequest, res: SendResponse) => Promise<void>
 
 /**
  * Listener Class
  * @since 1.0.0
+ * @extends EventEmitter
  */
 export class Hl7Inbound extends EventEmitter {
   /** @internal */
@@ -26,6 +40,13 @@ export class Hl7Inbound extends EventEmitter {
   /** @internal */
   private readonly _sockets: Socket[]
 
+  /**
+   * Build a Listener
+   * @since 1.0.0
+   * @param server
+   * @param props
+   * @param handler
+   */
   constructor (server: Server, props: ListenerOptions, handler: InboundHandler) {
     super()
     this._handler = handler
@@ -137,7 +158,6 @@ export class Hl7Inbound extends EventEmitter {
       this._closeSocket(socket)
     })
 
-    // eslint-disable-next-line no-unused-vars
     socket.on('close', hadError => {
       this.emit('client.close', hadError)
       this._closeSocket(socket)
