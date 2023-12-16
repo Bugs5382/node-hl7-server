@@ -14,12 +14,12 @@ import { Server } from './server.js'
  * @since 1.0.0
  * @example
  * In this example, we are processing the results in an async handler.
- *
+ *````
  *  const IB_ADT = server.createInbound({port: 3000}, async (req, res) => {
  *    const messageReq = req.getMessage()
  *    const messageRes = res.getAckMessage()
  *  })
- *
+ *```
  */
 export type InboundHandler = (req: InboundRequest, res: SendResponse) => Promise<void>
 
