@@ -1,12 +1,12 @@
 import EventEmitter from 'events'
 import net, { Socket } from 'net'
 import tls from 'tls'
-import { Batch, Message, isBatch, isFile, createHL7Date } from '../../../node-hl7-client/src'
+import { Batch, Message, isBatch, isFile, createHL7Date } from 'node-hl7-client'
 import { ListenerOptions, normalizeListenerOptions } from '../utils/normalize.js'
-import { InboundRequest } from './modules/inboundRequest'
-import { Parser } from './modules/parser'
-import { SendResponse } from './modules/sendResponse'
-import { Server } from './server'
+import { InboundRequest } from './modules/inboundRequest.js'
+import { Parser } from './modules/parser.js'
+import { SendResponse } from './modules/sendResponse.js'
+import { Server } from './server.js'
 
 export type InboundHandler = (req: InboundRequest, res: SendResponse) => Promise<void>
 
@@ -163,7 +163,6 @@ export class Hl7Inbound extends EventEmitter {
     ackMessage.set('MSH.11', message.get('MSH.11').toRaw())
 
     const segment = ackMessage.addSegment('MSA')
-
     segment.set('1', 'AA')
     segment.set('2', message.get('MSH.10').toString())
 

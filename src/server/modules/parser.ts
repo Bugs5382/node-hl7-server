@@ -1,5 +1,5 @@
 import { Writable } from 'stream'
-import { HL7ServerError } from '../../utils/exception'
+import { HL7ServerError } from '../../utils/exception.js'
 
 export class Parser extends Writable {
   buf: Buffer | null
@@ -9,11 +9,7 @@ export class Parser extends Writable {
     this.buf = null
   }
 
-  /**
-   *
-   * @param chunk
-   * @param cb
-   */
+  /** @internal */
   _write (chunk: Buffer, cb: any): void {
     let packet = chunk
 

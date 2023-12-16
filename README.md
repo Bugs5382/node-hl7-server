@@ -3,7 +3,7 @@ Node.js client library for creating a HL7 Server which can accept incoming a pro
 
 Benefits:
 
-- No other main dependencies (other than the sister app called ```node-hl7-client`` which also uses no dependencies), making this ultra-fast.
+- No other main dependencies (other than the sister app called ```node-hl7-client`` which also uses no other external dependencies), making this ultra-fast.
 - Automatically re-connect, re-subscribe, or retry sending
 - Written in typescript and published with heavily commented type definitions
 - Intuitive API with named parameters instead of positional

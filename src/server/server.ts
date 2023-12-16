@@ -1,5 +1,5 @@
 import EventEmitter from 'events'
-import { Hl7Inbound, InboundHandler } from './hl7Inbound'
+import { Hl7Inbound, InboundHandler } from './hl7Inbound.js'
 import { ServerOptions, normalizeServerOptions, ListenerOptions } from '../utils/normalize.js'
 
 export class Server extends EventEmitter {

@@ -1,5 +1,5 @@
 import { Socket } from 'net'
-import { Message } from '../../../../node-hl7-client/src'
+import { Message } from 'node-hl7-client'
 
 /**
  * Send Response

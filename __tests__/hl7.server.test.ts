@@ -2,8 +2,9 @@ import fs from "fs";
 import path from "node:path";
 import portfinder from 'portfinder'
 import tcpPortUsed from 'tcp-port-used'
-import {Client, expectEvent, Message, sleep} from "../../node-hl7-client/src";
+import {Client, Message} from "node-hl7-client";
 import { Server } from '../src'
+import {expectEvent, sleep} from "./__utils__";
 
 describe('node hl7 server', () => {
 
@@ -286,42 +287,6 @@ describe('node hl7 server', () => {
         await IB_ADT.close()
 
       })
-
-    })
-
-    test.skip('...send message in batch, get proper ACK', async () => {
-
-      const server = new Server({bindAddress: '0.0.0.0'})
-      const IB_ADT = server.createInbound({port: 3000}, async (req, res) => {
-        const messageReq = req.getMessage()
-        const messageRes = res.getAckMessage()
-        expect(messageRes.get('MSA.1').toString()).toBe('AA')
-        expect(messageReq.get('MSH.12').toString()).toBe('2.7')
-      })
-
-      await sleep(2)
-
-      const client = new Client({host: '0.0.0.0'})
-      const OB_ADT = client.createOutbound({ port: 3000 }, async (res) => {
-        console.log(res)
-      })
-
-      await sleep(2)
-
-      let message = new Message({
-        messageHeader: {
-          msh_9_1: "ADT",
-          msh_9_2: "A01",
-          msh_10: 'CONTROL_ID'
-        }
-      })
-
-      await OB_ADT.sendMessage(message)
-
-      await sleep(10)
-
-      await OB_ADT.close()
-      await IB_ADT.close()
 
     })
 

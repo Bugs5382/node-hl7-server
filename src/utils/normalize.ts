@@ -1,8 +1,7 @@
 import { TcpSocketConnectOpts } from 'node:net'
 import type { ConnectionOptions as TLSOptions } from 'node:tls'
-import { assertNumber, validIPv4, validIPv6 } from '../../../node-hl7-client/src'
-import { HL7ListenerError, HL7ServerError } from './exception'
-import { randomString } from './utils'
+import {assertNumber, randomString, validIPv4, validIPv6} from 'node-hl7-client'
+import { HL7ListenerError, HL7ServerError } from './exception.js'
 
 const DEFAULT_SERVER_OPTS = {
   bindAddress: '0.0.0.0',
