@@ -19,9 +19,12 @@ export class Server extends EventEmitter {
    * @example
    *
    * Non-TLS:
+   * ```
    * const server = new Server()
+   * ```
    *
    * TLS:
+   * ```
    * const server = new Server(
    *   {
    *     tls:
@@ -31,6 +34,7 @@ export class Server extends EventEmitter {
    *         rejectUnauthorized: false
    *       }
    *   })
+   *   ```
    *
    */
   constructor (props?: ServerOptions) {
@@ -42,7 +46,7 @@ export class Server extends EventEmitter {
    * @description You would specify your port and what it will do when it gets a message.
    * @since 1.0.0
    * @example
-   *
+   *```
    * const server = new Server()
    *
    * const IB = server.createInbound({port: 3000}, async (req, res) => {
@@ -50,7 +54,7 @@ export class Server extends EventEmitter {
    *   const messageRes = res.getAckMessage()
    *   // do your code here
    * })
-   *
+   *```
    *
    * */
   createInbound (props: ListenerOptions, cb: InboundHandler): Hl7Inbound {
