@@ -14,6 +14,9 @@ const DEFAULT_LISTENER_OPTS = {
   encoding: 'utf-8'
 }
 
+/**
+ * @since 1.0.0
+ */
 export interface ServerOptions {
   /** The network address to listen on expediently.
    * @default 0.0.0.0 */
@@ -31,6 +34,9 @@ export interface ServerOptions {
   tls?: TLSOptions
 }
 
+/**
+ * @since 1.0.0
+ */
 export interface ListenerOptions {
   /** Name of the Listener (e.g., IB_EPIC_ADT)
    * @default Randomized String */
@@ -44,11 +50,17 @@ export interface ListenerOptions {
   encoding?: BufferEncoding
 }
 
+/**
+ * @since 1.0.0
+ */
 type ValidatedKeys =
   | 'name'
   | 'port'
   | 'encoding'
 
+/**
+ * @since 1.0.0
+ */
 interface ValidatedOptions extends Pick<Required<ListenerOptions>, ValidatedKeys> {
   name: string
   port: number

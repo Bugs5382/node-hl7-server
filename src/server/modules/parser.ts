@@ -1,6 +1,9 @@
 import { Writable } from 'stream'
 import { HL7ServerError } from '../../utils/exception.js'
 
+/**
+ * @since 1.0.0
+ */
 export class Parser extends Writable {
   buf: Buffer | null
 

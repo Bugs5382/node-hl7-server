@@ -1,5 +1,7 @@
-/** Base Error Class */
+/** Base Error Class
+ * @since 1.0.0 */
 class HL7Error extends Error {
+  /** @internal */
   code: number
   /** @internal */
   constructor (code: number, message: string) {
@@ -9,13 +11,15 @@ class HL7Error extends Error {
   }
 }
 
-/** Server Error */
+/** Server Error
+ * @since 1.0.0 */
 export class HL7ServerError extends HL7Error {
   /** @internal */
   name = 'HL7ServerError'
 }
 
-/** Listener Error */
+/** Listener Error
+ * @since 1.0.0 */
 export class HL7ListenerError extends HL7Error {
   /** @internal */
   name = 'HL7ListenerError'
