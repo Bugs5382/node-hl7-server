@@ -1,7 +1,7 @@
 import EventEmitter from 'events'
 import net, { Socket } from 'net'
 import tls from 'tls'
-import { Batch, Message, isBatch, isFile, createHL7Date } from 'node-hl7-client'
+import { Batch, Message, isBatch, isFile } from 'node-hl7-client'
 import { ListenerOptions, normalizeListenerOptions } from '../utils/normalize.js'
 import { InboundRequest } from './modules/inboundRequest.js'
 import { Parser } from './modules/parser.js'
@@ -82,8 +82,8 @@ export class Hl7Inbound extends EventEmitter {
     const ipv6 = this._main._opt.ipv6
 
     if (typeof this._main._opt.tls !== 'undefined') {
-      const {key, cert, requestCert, ca} = this._main._opt.tls
-      socket = tls.createServer({key, cert, requestCert, ca},socket => this._onTcpClientConnected(socket))
+      const { key, cert, requestCert, ca } = this._main._opt.tls
+      socket = tls.createServer({ key, cert, requestCert, ca }, socket => this._onTcpClientConnected(socket))
     } else {
       socket = net.createServer(socket => this._onTcpClientConnected(socket))
     }
@@ -134,7 +134,7 @@ export class Hl7Inbound extends EventEmitter {
           allMessage.forEach((message: Message) => {
             const messageParsed = new Message({ text: message.toString() })
             const req = new InboundRequest(messageParsed)
-            const res = new SendResponse(socket, this._createAckMessage(message))
+            const res = new SendResponse(socket, message)
             this._handler(req, res)
           })
         } else if (isFile(data.toString())) {
@@ -145,7 +145,7 @@ export class Hl7Inbound extends EventEmitter {
           // request
           const req = new InboundRequest(parser)
           // response
-          const res = new SendResponse(socket, this._createAckMessage(parser))
+          const res = new SendResponse(socket, parser)
           this._handler(req, res)
         }
       } catch (err) {
@@ -164,29 +164,6 @@ export class Hl7Inbound extends EventEmitter {
     })
 
     this.emit('client.connect', socket)
-  }
-
-  /** @internal */
-  private _createAckMessage (message: Message): Message {
-    const ackMessage = new Message({
-      messageHeader: {
-        msh_9_1: 'ACK',
-        msh_9_2: message.get('MSH.9.2').toString(),
-        msh_10: `ACK${createHL7Date(new Date())}`
-      }
-    })
-
-    ackMessage.set('MSH.3', message.get('MSH.5').toRaw())
-    ackMessage.set('MSH.4', message.get('MSH.6').toRaw())
-    ackMessage.set('MSH.5', message.get('MSH.3').toRaw())
-    ackMessage.set('MSH.6', message.get('MSH.4').toRaw())
-    ackMessage.set('MSH.11', message.get('MSH.11').toRaw())
-
-    const segment = ackMessage.addSegment('MSA')
-    segment.set('1', 'AA')
-    segment.set('2', message.get('MSH.10').toString())
-
-    return ackMessage
   }
 
   /** @internal */

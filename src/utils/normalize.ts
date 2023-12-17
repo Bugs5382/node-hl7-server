@@ -1,6 +1,6 @@
 import { TcpSocketConnectOpts } from 'node:net'
 import type { ConnectionOptions as TLSOptions } from 'node:tls'
-import {assertNumber, randomString, validIPv4, validIPv6} from 'node-hl7-client'
+import { assertNumber, randomString, validIPv4, validIPv6 } from 'node-hl7-client'
 import { HL7ListenerError, HL7ServerError } from './exception.js'
 
 const DEFAULT_SERVER_OPTS = {
