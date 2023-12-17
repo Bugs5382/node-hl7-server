@@ -1,3 +1,10 @@
+# [1.0.0-beta.2](https://github.com/Bugs5382/node-hl7-server/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2023-12-17)
+
+
+### Features
+
+* server sends back proper response ([681be32](https://github.com/Bugs5382/node-hl7-server/commit/681be328e0de07fa5d5838877aa30ffed2496c66)), closes [#13](https://github.com/Bugs5382/node-hl7-server/issues/13)
+
 # 1.0.0-beta.1 (2023-12-16)
 
 
