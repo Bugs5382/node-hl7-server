@@ -6,7 +6,7 @@ import { HL7ListenerError, HL7ServerError } from './exception.js'
 const DEFAULT_SERVER_OPTS = {
   bindAddress: '0.0.0.0',
   encoding: 'utf-8',
-  ipv4: false,
+  ipv4: true,
   ipv6: false
 }
 
