@@ -45,7 +45,7 @@ describe('node hl7 server', () => {
 
     test(`error - ipv6 not empty`, async  () => {
       try {
-        new Server({bindAddress: "", ipv6: true})
+        new Server({bindAddress: "", ipv6: true, ipv4: false})
       } catch (err: any) {
         expect(err.message).toBe('bindAddress is an invalid ipv6 address.')
       }
@@ -53,7 +53,7 @@ describe('node hl7 server', () => {
 
     test(`error - ipv6 not valid address`, async  () => {
       try {
-        new Server({bindAddress: "2001:0db8:85a3:0000:zz00:8a2e:0370:7334", ipv6: true})
+        new Server({bindAddress: "2001:0db8:85a3:0000:zz00:8a2e:0370:7334", ipv6: true, ipv4: false})
       } catch (err: any) {
         expect(err.message).toBe('bindAddress is an invalid ipv6 address.')
       }
@@ -61,7 +61,7 @@ describe('node hl7 server', () => {
 
     test(`error - ipv6 valid address`, async  () => {
       try {
-        new Server({bindAddress: "2001:0db8:85a3:0000:0000:8a2e:0370:7334", ipv6: true})
+        new Server({bindAddress: "2001:0db8:85a3:0000:0000:8a2e:0370:7334", ipv6: true, ipv4: false})
       } catch (err: any) {
         expect(err.message).toBeUndefined()
       }
