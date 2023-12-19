@@ -2,9 +2,9 @@ import EventEmitter from 'events'
 import net, { Socket } from 'net'
 import tls from 'tls'
 import { Batch, Message, isBatch, isFile } from 'node-hl7-client'
+import { CR, FS, VT } from '../utils/constants'
 import { ListenerOptions, normalizeListenerOptions } from '../utils/normalize.js'
 import { InboundRequest } from './modules/inboundRequest.js'
-import { Parser } from './modules/parser.js'
 import { SendResponse } from './modules/sendResponse.js'
 import { Server } from './server.js'
 
@@ -102,7 +102,7 @@ export class Hl7Inbound extends EventEmitter {
   /** @internal */
   private _onTcpClientConnected (socket: Socket): void {
     // set message
-    let message: string = ''
+    let loadedMessage: string = ''
 
     // add socked connection to array
     this._sockets.push(socket)
@@ -113,47 +113,47 @@ export class Hl7Inbound extends EventEmitter {
     // set encoding
     socket.setEncoding(this._opt.encoding)
 
-    // custom parser
-    const parser = new Parser()
-
-    // process sock though custom parser
-    socket.pipe(parser)
-
-    parser.on('data', data => {
+    socket.on('data', data => {
       try {
-        // parser either is batch or a message
-        let parser: Batch | Message
         // set message
-        message = data.toString()
-        if (isBatch(message)) {
-          // parser the batch
-          parser = new Batch({ text: message })
-          // load the messages
-          const allMessage = parser.messages()
-          // loop messages
-          allMessage.forEach((message: Message) => {
-            const messageParsed = new Message({ text: message.toString() })
-            const req = new InboundRequest(messageParsed)
+        loadedMessage = data.toString().replace(VT, '')
+
+        // is there is F5 and CR in this message?
+        if (loadedMessage.includes(FS + CR)) {
+          // strip them out
+          loadedMessage = loadedMessage.replace(FS + CR, '')
+
+          // parser either is batch or a message
+          let parser: Batch | Message
+
+          if (isBatch(loadedMessage)) {
+            // parser the batch
+            parser = new Batch({ text: loadedMessage })
+            // load the messages
+            const allMessage = parser.messages()
+            // loop messages
+            allMessage.forEach((message: Message) => {
+              const messageParsed = new Message({ text: message.toString() })
+              const req = new InboundRequest(messageParsed)
+              const res = new SendResponse(socket, message)
+              this._handler(req, res)
+            })
+          } else if (isFile(data.toString())) {
+            // * noop, not created yet * //
+          } else {
+            // parse the message
+            const message = new Message({ text: loadedMessage })
+            const req = new InboundRequest(message)
             const res = new SendResponse(socket, message)
             this._handler(req, res)
-          })
-        } else if (isFile(data.toString())) {
-          // * noop, not created yet * //
-        } else {
-          // parse the message
-          const parser = new Message({ text: message })
-          // request
-          const req = new InboundRequest(parser)
-          // response
-          const res = new SendResponse(socket, parser)
-          this._handler(req, res)
+          }
         }
       } catch (err) {
         this.emit('data.error', err)
       }
     })
 
-    parser.on('error', err => {
+    socket.on('error', err => {
       this.emit('client.error', err)
       this._closeSocket(socket)
     })

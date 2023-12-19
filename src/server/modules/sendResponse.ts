@@ -1,5 +1,6 @@
 import { Socket } from 'net'
-import { createHL7Date, Message } from 'node-hl7-client'
+import { createHL7Date, Message, randomString } from 'node-hl7-client'
+import { CR, FS, VT } from '../../utils/constants'
 
 /**
  * Send Response
@@ -44,10 +45,10 @@ export class SendResponse {
   async sendResponse (type: 'AA' | 'AR'): Promise<boolean> {
     try {
       this._ack = this._createAckMessage(type, this._message)
-      this._socket.write(Buffer.from(this._ack.toString()))
+      this._socket.write(Buffer.from(`${VT}${this._ack.toString()}${FS}${CR}`))
     } catch (_e: any) {
-      this._ack = this._createAckMessage('AE', this._message)
-      this._socket.write(Buffer.from(this._ack.toString()))
+      this._ack = this._createAEAckMessage() // create application error message
+      this._socket.write(Buffer.from(`${VT}${this._ack.toString()}${FS}${CR}`))
     }
 
     this._ackSent = true
@@ -70,10 +71,32 @@ export class SendResponse {
     ackMessage.set('MSH.5', message.get('MSH.3').toRaw())
     ackMessage.set('MSH.6', message.get('MSH.4').toRaw())
     ackMessage.set('MSH.11', message.get('MSH.11').toRaw())
+    ackMessage.set('MSH.12', message.get('MSH.12').toRaw())
 
     const segment = ackMessage.addSegment('MSA')
     segment.set('1', type)
     segment.set('2', message.get('MSH.10').toString())
+
+    return ackMessage
+  }
+
+  /** @internal */
+  private _createAEAckMessage (): Message {
+    const ackMessage = new Message({
+      messageHeader: {
+        msh_9_1: 'ACK',
+        msh_9_2: '',
+        msh_10: `ACK${createHL7Date(new Date())}`
+      }
+    })
+
+    ackMessage.set('MSH.3', '') // This would need to be set by the application. Maybe from the server class?
+    ackMessage.set('MSH.4', '') // This would need to be set by the application. Maybe from the server class?
+    ackMessage.set('MSH.11', 'P')
+
+    const segment = ackMessage.addSegment('MSA')
+    segment.set('1', 'AE')
+    segment.set('2', randomString())
 
     return ackMessage
   }
