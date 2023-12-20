@@ -1,3 +1,13 @@
+# [1.0.0-beta.4](https://github.com/Bugs5382/node-hl7-server/compare/v1.0.0-beta.3...v1.0.0-beta.4) (2023-12-20)
+
+
+### Features
+
+* fixed send response ([f4c8b5e](https://github.com/Bugs5382/node-hl7-server/commit/f4c8b5e1a7e81a9e029cc25fa9d4bc689c21cae7))
+* removed passing 'this._message' ([60f5798](https://github.com/Bugs5382/node-hl7-server/commit/60f5798704029aec2a2cf47d039b4fa37d3122db))
+* revamp the server system ([d53ec37](https://github.com/Bugs5382/node-hl7-server/commit/d53ec37519b14647ec77e119c87250618b4954b8))
+* unit test merge issue ([4e20e54](https://github.com/Bugs5382/node-hl7-server/commit/4e20e54eed5282d1fe45af6be0809bf93e9d3b95))
+
 # [1.0.0-beta.3](https://github.com/Bugs5382/node-hl7-server/compare/v1.0.0-beta.2...v1.0.0-beta.3) (2023-12-20)
 
 
