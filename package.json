@@ -30,7 +30,13 @@
     "typedoc:watch": "typedoc -watch",
     "semantic-release": "semantic-release",
     "semantic-release:dry-run": "semantic-release --dry-run",
-    "update": "npx npm-check-updates -u && npm install && npm run test"
+    "update": "npx npm-check-updates -u && npm run update:post-update",
+    "update:greatest": "npx npm-check-updates --target greatest",
+    "update:minor": "npx npm-check-updates --target minor -u && npm run update:post-update",
+    "update:newest": "npx npm-check-updates --target newest",
+    "update:patch": "npx npm-check-updates --target patch",
+    "update:semver": "npx npm-check-updates --target semver",
+    "update:post-update": "npm install && npm run test:ci"
   },
   "repository": {
     "type": "git",
@@ -56,9 +62,9 @@
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/release-notes-generator": "^12.1.0",
     "@types/jest": "^29.5.11",
-    "@types/node": "^20.10.4",
+    "@types/node": "^20.10.5",
     "@types/tcp-port-used": "^1.0.4",
-    "@typescript-eslint/parser": "^6.14.0",
+    "@typescript-eslint/parser": "^6.15.0",
     "jest": "^29.7.0",
     "jest-ts-webcompat-resolver": "^1.0.0",
     "portfinder": "^1.0.32",
@@ -69,11 +75,11 @@
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.2",
     "ts-standard": "^12.0.2",
-    "tsd": "^0.29.0",
+    "tsd": "^0.30.0",
     "typedoc": "^0.25.4",
     "typescript": "5.3.3"
   },
   "dependencies": {
-    "node-hl7-client": "^1.0.0-beta.8"
+    "node-hl7-client": "^1.0.0-beta.11"
   }
 }
