@@ -1,3 +1,11 @@
+# [1.0.0-beta.5](https://github.com/Bugs5382/node-hl7-server/compare/v1.0.0-beta.4...v1.0.0-beta.5) (2023-12-20)
+
+
+### Features
+
+* emit sends can send raw data back to the server ([558a5d1](https://github.com/Bugs5382/node-hl7-server/commit/558a5d193af188f55d15ab16df25f7d07ebd8c18))
+* inbound request parma ([4f9fb63](https://github.com/Bugs5382/node-hl7-server/commit/4f9fb631cdbbf3a23cf4c90f64aa73a65550dbcc)), closes [#20](https://github.com/Bugs5382/node-hl7-server/issues/20) [#21](https://github.com/Bugs5382/node-hl7-server/issues/21)
+
 # [1.0.0-beta.4](https://github.com/Bugs5382/node-hl7-server/compare/v1.0.0-beta.3...v1.0.0-beta.4) (2023-12-20)
 
 
