@@ -1,3 +1,11 @@
+# [1.0.0-beta.3](https://github.com/Bugs5382/node-hl7-server/compare/v1.0.0-beta.2...v1.0.0-beta.3) (2023-12-20)
+
+
+### Features
+
+* fixed send response ([b9a40e8](https://github.com/Bugs5382/node-hl7-server/commit/b9a40e848da80c4765ccac7cc6687bd7c8e72cef))
+* revamp the server system ([0c388a0](https://github.com/Bugs5382/node-hl7-server/commit/0c388a038565b551d89fdd4eee72a9c6a3746010))
+
 # [1.0.0-beta.2](https://github.com/Bugs5382/node-hl7-server/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2023-12-17)
 
 
