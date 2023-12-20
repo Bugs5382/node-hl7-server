@@ -86,9 +86,12 @@ export class SendResponse {
     const ackMessage = new Message({
       messageHeader: {
         msh_9_1: 'ACK',
-        msh_9_2: '',
+        // There is no 9.2 for ACK a failure.
+        // There should be.
+        // So we are using Z99 which is not assigned yet.
+        msh_9_2: 'Z99',
         msh_10: `ACK${createHL7Date(new Date())}`,
-        msh_11_1: "P"
+        msh_11_1: 'P'
       }
     })
 

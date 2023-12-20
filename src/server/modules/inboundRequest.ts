@@ -1,6 +1,10 @@
 import { Message } from 'node-hl7-client'
 import { HL7ListenerError } from '../../utils/exception.js'
 
+interface InboundRequestProps {
+  type: string
+}
+
 /**
  * Inbound Request
  * @since 1.0.0
@@ -8,13 +12,17 @@ import { HL7ListenerError } from '../../utils/exception.js'
 export class InboundRequest {
   /** @internal */
   private readonly _message?: Message
+  /** @internal */
+  private readonly _fromType: string;
 
   /**
    * @since 1.0.0
-   * @param data
+   * @param message
+   * @param props
    */
-  constructor (data: Message) {
-    this._message = data
+  constructor (message: Message, props: InboundRequestProps) {
+    this._fromType = props.type
+    this._message = message
   }
 
   /** '
@@ -26,5 +34,9 @@ export class InboundRequest {
       return this._message
     }
     throw new HL7ListenerError(500, 'Message is not defined.')
+  }
+
+  getType(): string {
+    return this._fromType
   }
 }
