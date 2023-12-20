@@ -1,3 +1,11 @@
+# [1.0.0-beta.6](https://github.com/Bugs5382/node-hl7-server/compare/v1.0.0-beta.5...v1.0.0-beta.6) (2023-12-20)
+
+
+### Bug Fixes
+
+* fix node-hl7-client dependency ([253f7c4](https://github.com/Bugs5382/node-hl7-server/commit/253f7c4d2da769c1a8d8c35b4fcdeb686a8cf966))
+* fix node-hl7-client dependency x2 ([653cdc7](https://github.com/Bugs5382/node-hl7-server/commit/653cdc7f79155662d566b9b59c030e222e180ed3))
+
 # [1.0.0-beta.5](https://github.com/Bugs5382/node-hl7-server/compare/v1.0.0-beta.4...v1.0.0-beta.5) (2023-12-20)
 
 
