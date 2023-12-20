@@ -47,7 +47,7 @@ export class SendResponse {
       this._ack = this._createAckMessage(type, this._message)
       this._socket.write(Buffer.from(`${VT}${this._ack.toString()}${FS}${CR}`))
     } catch (_e: any) {
-      this._ack = this._createAEAckMessage(this._message)
+      this._ack = this._createAEAckMessage()
       this._socket.write(Buffer.from(`${VT}${this._ack.toString()}${FS}${CR}`))
     }
 
@@ -82,19 +82,18 @@ export class SendResponse {
   }
 
   /** @internal */
-  private _createAEAckMessage (message: Message): Message {
+  private _createAEAckMessage (): Message {
     const ackMessage = new Message({
       messageHeader: {
         msh_9_1: 'ACK',
         msh_9_2: '',
         msh_10: `ACK${createHL7Date(new Date())}`,
-        msh_11_1: message.get('MSH.11.1').toString() as "P" | "D" | "T"
+        msh_11_1: "P"
       }
     })
 
     ackMessage.set('MSH.3', '') // This would need to be set by the application. Maybe from the server class?
     ackMessage.set('MSH.4', '') // This would need to be set by the application. Maybe from the server class?
-    ackMessage.set('MSH.11', 'P')
 
     const segment = ackMessage.addSegment('MSA')
     segment.set('1', 'AE')
