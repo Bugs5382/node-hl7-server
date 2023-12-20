@@ -80,6 +80,6 @@
     "typescript": "5.3.3"
   },
   "dependencies": {
-    "node-hl7-client": "^1.0.0-beta.14"
+    "node-hl7-client": "^1.0.0-beta.15"
   }
 }
