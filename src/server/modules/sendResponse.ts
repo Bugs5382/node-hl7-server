@@ -47,7 +47,7 @@ export class SendResponse {
       this._ack = this._createAckMessage(type, this._message)
       this._socket.write(Buffer.from(`${VT}${this._ack.toString()}${FS}${CR}`))
     } catch (_e: any) {
-      this._ack = this._createAEAckMessage() // create application error message
+      this._ack = this._createAEAckMessage(this._message)
       this._socket.write(Buffer.from(`${VT}${this._ack.toString()}${FS}${CR}`))
     }
 
@@ -62,7 +62,8 @@ export class SendResponse {
       messageHeader: {
         msh_9_1: 'ACK',
         msh_9_2: message.get('MSH.9.2').toString(),
-        msh_10: `ACK${createHL7Date(new Date())}`
+        msh_10: `ACK${createHL7Date(new Date())}`,
+        msh_11_1: message.get('MSH.11.1').toString() as "P" | "D" | "T"
       }
     })
 
@@ -81,12 +82,13 @@ export class SendResponse {
   }
 
   /** @internal */
-  private _createAEAckMessage (): Message {
+  private _createAEAckMessage (message: Message): Message {
     const ackMessage = new Message({
       messageHeader: {
         msh_9_1: 'ACK',
         msh_9_2: '',
-        msh_10: `ACK${createHL7Date(new Date())}`
+        msh_10: `ACK${createHL7Date(new Date())}`,
+        msh_11_1: message.get('MSH.11.1').toString() as "P" | "D" | "T"
       }
     })
 
