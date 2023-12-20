@@ -122,7 +122,7 @@ describe('node hl7 server', () => {
     test('error - getMessage() - no message passed to inbound request', async() => {
       try {
         // @ts-expect-error no message.
-        const inboundReq = new InboundRequest()
+        const inboundReq = new InboundRequest("", {type: 'message'})
         // this should cause an error
         inboundReq.getMessage()
       } catch (err: any) {

@@ -1,7 +1,7 @@
 import EventEmitter from 'events'
 import net, { Socket } from 'net'
 import tls from 'tls'
-import { Batch, Message, isBatch, isFile } from 'node-hl7-client'
+import { FileBatch, Batch, Message, isBatch, isFile } from 'node-hl7-client'
 import { CR, FS, VT } from '../utils/constants'
 import { ListenerOptions, normalizeListenerOptions } from '../utils/normalize.js'
 import { InboundRequest } from './modules/inboundRequest.js'
@@ -124,7 +124,7 @@ export class Hl7Inbound extends EventEmitter {
           loadedMessage = loadedMessage.replace(FS + CR, '')
 
           // parser either is batch or a message
-          let parser: Batch | Message
+          let parser: FileBatch | Batch | Message
 
           // send raw information to the emit
           this.emit('data.raw', loadedMessage)
@@ -137,16 +137,25 @@ export class Hl7Inbound extends EventEmitter {
             // loop messages
             allMessage.forEach((message: Message) => {
               const messageParsed = new Message({ text: message.toString() })
-              const req = new InboundRequest(messageParsed)
+              const req = new InboundRequest(messageParsed, { type: 'batch' })
               const res = new SendResponse(socket, message)
               this._handler(req, res)
             })
-          } else if (isFile(data.toString())) {
-            // * noop, not created yet * //
+          } else if (isFile(loadedMessage)) {
+            // parser the batch
+            parser = new FileBatch({ text: loadedMessage })
+            // load the messages
+            const allMessage = parser.messages()
+            allMessage.forEach((message: Message) => {
+              const messageParsed = new Message({ text: message.toString() })
+              const req = new InboundRequest(messageParsed, { type: 'file' })
+              const res = new SendResponse(socket, message)
+              this._handler(req, res)
+            })
           } else {
             // parse the message
             const message = new Message({ text: loadedMessage })
-            const req = new InboundRequest(message)
+            const req = new InboundRequest(message, { type: 'message' })
             const res = new SendResponse(socket, message)
             this._handler(req, res)
           }
