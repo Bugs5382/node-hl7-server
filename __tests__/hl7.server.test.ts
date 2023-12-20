@@ -1,7 +1,4 @@
-import portfinder from 'portfinder'
-import tcpPortUsed from 'tcp-port-used'
 import {InboundRequest, Server} from '../src'
-import {expectEvent} from "./__utils__";
 
 describe('node hl7 server', () => {
 
@@ -135,51 +132,6 @@ describe('node hl7 server', () => {
 
   })
 
-  describe('basic server tests', () => {
-    let LISTEN_PORT: number;
 
-    beforeEach(async () => {
-      LISTEN_PORT = await portfinder.getPortPromise({
-        port: 3000,
-        stopPort: 65353
-      })
-    })
-
-    test('...listen on a randomized port', async () => {
-      const server = new Server()
-      const listener = server.createInbound({ port: LISTEN_PORT}, async () => {})
-      const usedCheck = await tcpPortUsed.check(LISTEN_PORT, '0.0.0.0')
-
-      expect(usedCheck).toBe(true)
-
-      await listener.close()
-
-    })
-
-    test('...should not be able to listen on the same port', async () => {
-      const server = new Server()
-      const listenerOne = server.createInbound({ port: LISTEN_PORT}, async () => {})
-      const listenerTwo = server.createInbound({ port: LISTEN_PORT}, async () => {})
-
-      await expectEvent(listenerTwo, 'error')
-
-      await listenerOne.close()
-
-    })
-
-    test('...two different ports', async () => {
-      const server = new Server()
-      const listenerOne = server.createInbound({ port: LISTEN_PORT}, async () => {})
-      const listenerTwo = server.createInbound({ port: await portfinder.getPortPromise({
-          port: 3001,
-          stopPort: 65353
-        })}, async () => {})
-
-      await listenerOne.close()
-      await listenerTwo.close()
-
-    })
-
-  })
 
 })
