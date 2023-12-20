@@ -126,6 +126,9 @@ export class Hl7Inbound extends EventEmitter {
           // parser either is batch or a message
           let parser: Batch | Message
 
+          // send raw information to the emit
+          this.emit('data.raw', loadedMessage)
+
           if (isBatch(loadedMessage)) {
             // parser the batch
             parser = new Batch({ text: loadedMessage })
