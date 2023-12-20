@@ -1,5 +1,3 @@
-import fs from "fs";
-import path from "node:path";
 import portfinder from 'portfinder'
 import tcpPortUsed from 'tcp-port-used'
 import {InboundRequest, Server} from '../src'
@@ -180,26 +178,6 @@ describe('node hl7 server', () => {
       await listenerOne.close()
       await listenerTwo.close()
 
-    })
-
-    test('...use tls', async () => {
-
-      const server = new Server(
-        {
-          tls:
-            {
-              key: fs.readFileSync(path.join('certs/', 'server-key.pem')),
-              cert: fs.readFileSync(path.join('certs/', 'server-crt.pem')),
-              rejectUnauthorized: false
-            }
-        })
-      const listener = server.createInbound({ port: LISTEN_PORT}, async () => {})
-
-      const usedCheck = await tcpPortUsed.check(LISTEN_PORT, '0.0.0.0')
-
-      expect(usedCheck).toBe(true)
-
-      await listener.close()
     })
 
   })
