@@ -1,10 +1,12 @@
 # Folders
 .github
 .idea
+.run
 bin
+certs
 docs
 src
-certs
+temp
 __tests__
 coverage
 
