@@ -63,7 +63,7 @@ export class SendResponse {
         msh_9_1: 'ACK',
         msh_9_2: message.get('MSH.9.2').toString(),
         msh_10: `ACK${createHL7Date(new Date())}`,
-        msh_11_1: message.get('MSH.11.1').toString() as "P" | "D" | "T"
+        msh_11_1: message.get('MSH.11.1').toString() as 'P' | 'D' | 'T'
       }
     })
 

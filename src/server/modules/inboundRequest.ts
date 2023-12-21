@@ -13,7 +13,7 @@ export class InboundRequest {
   /** @internal */
   private readonly _message?: Message
   /** @internal */
-  private readonly _fromType: string;
+  private readonly _fromType: string
 
   /**
    * @since 1.0.0
@@ -36,7 +36,7 @@ export class InboundRequest {
     throw new HL7ListenerError(500, 'Message is not defined.')
   }
 
-  getType(): string {
+  getType (): string {
     return this._fromType
   }
 }
