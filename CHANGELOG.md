@@ -1,3 +1,10 @@
+# [1.0.0-beta.7](https://github.com/Bugs5382/node-hl7-server/compare/v1.0.0-beta.6...v1.0.0-beta.7) (2023-12-21)
+
+
+### Bug Fixes
+
+* removed temp folder from the npm package ([235876e](https://github.com/Bugs5382/node-hl7-server/commit/235876ed5aead741c0ccefe0a6ebcccb2070b0fb))
+
 # [1.0.0-beta.6](https://github.com/Bugs5382/node-hl7-server/compare/v1.0.0-beta.5...v1.0.0-beta.6) (2023-12-20)
 
 
