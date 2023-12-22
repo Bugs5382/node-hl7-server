@@ -132,6 +132,4 @@ describe('node hl7 server', () => {
 
   })
 
-
-
 })
