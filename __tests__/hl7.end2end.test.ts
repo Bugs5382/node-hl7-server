@@ -187,28 +187,32 @@ describe('node hl7 end to end', () => {
          port: 3000,
          stopPort: 65353
        })
+
+       dfd = createDeferred<void>()
+
      })
   
      test('...no tls', async () => {
   
        const server = new Server({bindAddress: '0.0.0.0'})
-       const IB_ADT = server.createInbound({port: LISTEN_PORT}, async (req, res) => {
+       const IB_ADT = server.createInbound({ port: LISTEN_PORT }, async (req, res) => {
          const messageReq = req.getMessage()
          const messageType = req.getType()
          expect(messageType).toBe('batch')
          expect(messageReq.get('MSH.12').toString()).toBe('2.7')
          await res.sendResponse("AA")
        })
-  
-       await sleep(5)
+
+       await expectEvent(IB_ADT, 'listen')
   
        const client = new Client({host: '0.0.0.0'})
        const OB_ADT = client.createOutbound({ port: LISTEN_PORT }, async (res) => {
          const messageRes = res.getMessage()
          expect(messageRes.get('MSA.1').toRaw()).toBe('AA')
+         dfd.resolve()
        })
-  
-       await sleep(5)
+
+       await expectEvent(OB_ADT, 'connect')
   
        let batch = new Batch()
        batch.start()
@@ -229,6 +233,8 @@ describe('node hl7 end to end', () => {
        await OB_ADT.sendMessage(batch)
   
        await sleep(10)
+
+       dfd.promise
   
        await OB_ADT.close()
        await IB_ADT.close()
@@ -254,16 +260,17 @@ describe('node hl7 end to end', () => {
          expect(messageReq.get('MSH.12').toString()).toBe('2.7')
          await res.sendResponse("AA")
        })
-  
-       await sleep(5)
+
+       await expectEvent(IB_ADT, 'listen')
   
        const client = new Client({host: '0.0.0.0', tls: { rejectUnauthorized: false }})
        const OB_ADT = client.createOutbound({ port: LISTEN_PORT }, async (res) => {
          const messageRes = res.getMessage()
          expect(messageRes.get('MSA.1').toString()).toBe('AA')
+         dfd.resolve()
        })
-  
-       await sleep(5)
+
+       await expectEvent(OB_ADT, 'connect')
   
        let batch = new Batch()
        batch.start()
@@ -284,6 +291,8 @@ describe('node hl7 end to end', () => {
        await OB_ADT.sendMessage(batch)
   
        await sleep(10)
+
+       dfd.promise
   
        await OB_ADT.close()
        await IB_ADT.close()
