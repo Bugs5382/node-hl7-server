@@ -67,12 +67,11 @@ export class SendResponse {
       }
     })
 
-    ackMessage.set('MSH.3', message.get('MSH.5').toRaw())
-    ackMessage.set('MSH.4', message.get('MSH.6').toRaw())
-    ackMessage.set('MSH.5', message.get('MSH.3').toRaw())
-    ackMessage.set('MSH.6', message.get('MSH.4').toRaw())
-    ackMessage.set('MSH.11', message.get('MSH.11').toRaw())
-    ackMessage.set('MSH.12', message.get('MSH.12').toRaw())
+    ackMessage.set('MSH.3', message.get('MSH.5').toString())
+    ackMessage.set('MSH.4', message.get('MSH.6').toString())
+    ackMessage.set('MSH.5', message.get('MSH.3').toString())
+    ackMessage.set('MSH.6', message.get('MSH.4').toString())
+    ackMessage.set('MSH.12', message.get('MSH.12').toString())
 
     const segment = ackMessage.addSegment('MSA')
     segment.set('1', type)
