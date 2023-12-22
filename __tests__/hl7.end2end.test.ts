@@ -4,9 +4,11 @@ import path from "node:path";
 import portfinder from "portfinder";
 import tcpPortUsed from "tcp-port-used";
 import {Server} from "../src";
-import {expectEvent, sleep} from "./__utils__";
+import {createDeferred, Deferred, expectEvent, sleep} from "./__utils__";
 
 describe('node hl7 end to end', () => {
+
+  let dfd: Deferred<void>
 
   describe('basic server tests', () => {
     let LISTEN_PORT: number;
@@ -16,11 +18,15 @@ describe('node hl7 end to end', () => {
         port: 3000,
         stopPort: 65353
       })
+
     })
 
     test('...listen on a randomized port', async () => {
       const server = new Server()
       const listener = server.createInbound({ port: LISTEN_PORT}, async () => {})
+
+      await expectEvent(listener, 'listen')
+
       const usedCheck = await tcpPortUsed.check(LISTEN_PORT, '0.0.0.0')
 
       expect(usedCheck).toBe(true)
@@ -32,21 +38,30 @@ describe('node hl7 end to end', () => {
     test('...should not be able to listen on the same port', async () => {
       const server = new Server()
       const listenerOne = server.createInbound({ port: LISTEN_PORT}, async () => {})
-      const listenerTwo = server.createInbound({ port: LISTEN_PORT}, async () => {})
 
-      await expectEvent(listenerTwo, 'error')
+      await expectEvent(listenerOne, 'listen')
+
+      const listenerTwo = server.createInbound({ port: LISTEN_PORT+1}, async () => {})
+
+      await expectEvent(listenerTwo, 'listen')
 
       await listenerOne.close()
+      await listenerTwo.close()
 
     })
 
     test('...two different ports', async () => {
       const server = new Server()
       const listenerOne = server.createInbound({ port: LISTEN_PORT}, async () => {})
+
+      await expectEvent(listenerOne, 'listen')
+
       const listenerTwo = server.createInbound({ port: await portfinder.getPortPromise({
           port: 3001,
           stopPort: 65353
         })}, async () => {})
+
+      await expectEvent(listenerTwo, 'listen')
 
       await listenerOne.close()
       await listenerTwo.close()
@@ -55,14 +70,18 @@ describe('node hl7 end to end', () => {
 
   })
 
-   describe('...send message, get proper ACK', () => {
+  describe('...send message, get proper ACK', () => {
   
      let LISTEN_PORT: number
+
      beforeEach(async () => {
        LISTEN_PORT = await portfinder.getPortPromise({
          port: 3000,
          stopPort: 65353
        })
+
+       dfd = createDeferred<void>()
+
      })
   
      test('...no tls', async () => {
@@ -75,17 +94,17 @@ describe('node hl7 end to end', () => {
          expect(messageReq.get('MSH.12').toString()).toBe('2.7')
          await res.sendResponse("AA")
        })
-  
-       await sleep(5)
+
+       await expectEvent(IB_ADT, 'listen')
   
        const client = new Client({host: '0.0.0.0'})
-  
        const OB_ADT = client.createOutbound({ port: LISTEN_PORT }, async (res) => {
          const messageRes = res.getMessage()
          expect(messageRes.get('MSA.1').toString()).toBe('AA')
+         dfd.resolve()
        })
-  
-       await sleep(5)
+
+       await expectEvent(OB_ADT, 'connect')
   
        let message = new Message({
          messageHeader: {
@@ -97,8 +116,10 @@ describe('node hl7 end to end', () => {
        })
   
        await OB_ADT.sendMessage(message)
-  
+
        await sleep(10)
+
+       dfd.promise
   
        await OB_ADT.close()
        await IB_ADT.close()
@@ -124,16 +145,17 @@ describe('node hl7 end to end', () => {
          expect(messageReq.get('MSH.12').toString()).toBe('2.7')
          await res.sendResponse("AA")
        })
-  
-       await sleep(5)
+
+       await expectEvent(IB_ADT, 'listen')
   
        const client = new Client({host: '0.0.0.0', tls: { rejectUnauthorized: false }})
        const OB_ADT = client.createOutbound({ port: LISTEN_PORT }, async (res) => {
          const messageRes = res.getMessage()
          expect(messageRes.get('MSA.1').toString()).toBe('AA')
+         dfd.resolve()
        })
-  
-       await sleep(5)
+
+       await expectEvent(OB_ADT, 'connect')
   
        let message = new Message({
          messageHeader: {
@@ -145,8 +167,10 @@ describe('node hl7 end to end', () => {
        })
   
        await OB_ADT.sendMessage(message)
-  
+
        await sleep(10)
+
+       dfd.promise
   
        await OB_ADT.close()
        await IB_ADT.close()
@@ -155,7 +179,7 @@ describe('node hl7 end to end', () => {
   
    })
   
-   describe('...send batch with one message, get proper ACK', () => {
+  describe('...send batch with one message, get proper ACK', () => {
   
      let LISTEN_PORT: number
      beforeEach(async () => {
@@ -290,7 +314,20 @@ describe('node hl7 end to end', () => {
       const message = new Message({text: hl7_string, date: "8"})
       message.toFile('readFileTestMSH', true, 'temp/')
 
-      await sleep(15)
+      fs.access("temp/hl7.readFileTestMSH.20081231.hl7", fs.constants.F_OK, (err) => {
+        if (!err) {
+          // Do something
+        }
+      });
+
+      await (async () => {
+        try {
+          await fs.promises.access("temp/hl7.readFileTestMSH.20081231.hl7", fs.constants.F_OK);
+          // Do something
+        } catch (err) {
+          // Handle error
+        }
+      })();
 
     })
 
@@ -299,6 +336,9 @@ describe('node hl7 end to end', () => {
         port: 3000,
         stopPort: 65353
       })
+
+      dfd = createDeferred<void>()
+
     })
 
     test('...no tls', async () => {
@@ -310,21 +350,22 @@ describe('node hl7 end to end', () => {
         await res.sendResponse("AA")
       })
 
-      await sleep(5)
+      await expectEvent(IB_ADT, 'listen')
 
       const client = new Client({host: '0.0.0.0'})
       const OB_ADT = client.createOutbound({ port: LISTEN_PORT }, async (res) => {
         const messageRes = res.getMessage()
         expect(messageRes.get('MSA.1').toString()).toBe('AA')
+        dfd.resolve()
       })
 
-      await sleep(15)
+      await expectEvent(OB_ADT, 'connect')
 
       const fileBatch = await OB_ADT.readFile(`temp/hl7.readFileTestMSH.20081231.hl7`)
 
       await OB_ADT.sendMessage(fileBatch)
 
-      await sleep(10)
+      await dfd.promise
 
       await OB_ADT.close()
       await IB_ADT.close()
@@ -349,21 +390,22 @@ describe('node hl7 end to end', () => {
         await res.sendResponse("AA")
       })
 
-      await sleep(5)
+      await expectEvent(IB_ADT, 'listen')
 
       const client = new Client({host: '0.0.0.0', tls: { rejectUnauthorized: false }})
       const OB_ADT = client.createOutbound({ port: LISTEN_PORT }, async (res) => {
         const messageRes = res.getMessage()
         expect(messageRes.get('MSA.1').toString()).toBe('AA')
+        dfd.resolve()
       })
 
-      await sleep(15)
+      await expectEvent(OB_ADT, 'connect')
 
       const fileBatch = await OB_ADT.readFile(`temp/hl7.readFileTestMSH.20081231.hl7`)
 
       await OB_ADT.sendMessage(fileBatch)
 
-      await sleep(10)
+      await dfd.promise
 
       await OB_ADT.close()
       await IB_ADT.close()

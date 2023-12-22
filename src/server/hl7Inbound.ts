@@ -93,7 +93,7 @@ export class Hl7Inbound extends EventEmitter {
     })
 
     socket.listen({ port, ipv6Only: ipv6, hostname: bindAddress }, () => {
-
+      this.emit('listen')
     })
 
     return socket
