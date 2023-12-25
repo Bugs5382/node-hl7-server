@@ -132,7 +132,10 @@ docs
 .pnp.*
 
 # NPM
+lib
 package-lock.json
+.npmrc
 
 # Webstorm
 .idea
+temp
