@@ -1,7 +1,11 @@
 import { Message } from 'node-hl7-client'
 import { HL7ListenerError } from '../../utils/exception.js'
 
-interface InboundRequestProps {
+/**
+ * Inbound Request Props
+ * @since 1.0.0
+ */
+export interface InboundRequestProps {
   type: string
 }
 

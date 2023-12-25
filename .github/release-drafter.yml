@@ -1,6 +1,6 @@
 # Configuration for Release Drafter: https://github.com/toolmantim/release-drafter
-name-template: $NEXT_PATCH_VERSION
-tag-template: $NEXT_PATCH_VERSION
+name-template: v$NEXT_PATCH_VERSION
+tag-template: v$NEXT_PATCH_VERSION
 
 # Emoji reference: https://gitmoji.carloscuesta.me/
 categories:
@@ -38,8 +38,10 @@ exclude-labels:
   - skip-changelog
   - invalid
 template: |
-  <!-- Optional: add a release summary here -->
+  # What's Changed
   $CHANGES
+  
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
 
 
 autolabeler:
