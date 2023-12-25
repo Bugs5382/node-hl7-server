@@ -1,3 +1,22 @@
+# [1.0.0-beta.8](https://github.com/Bugs5382/node-hl7-server/compare/v1.0.0-beta.7...v1.0.0-beta.8) (2023-12-25)
+
+
+### Bug Fixes
+
+* sendResponse ([7cc8b71](https://github.com/Bugs5382/node-hl7-server/commit/7cc8b714e03c5aef684f73a7e15805af78b68e51))
+
+
+### Features
+
+* add more documentation ([#25](https://github.com/Bugs5382/node-hl7-server/issues/25)) ([fa012fe](https://github.com/Bugs5382/node-hl7-server/commit/fa012fe35e72b11163bbfc808e961f67b674dc5d))
+* using v1.0.0 of node-hl7-client ([dfdc4c6](https://github.com/Bugs5382/node-hl7-server/commit/dfdc4c6a9541a6f11a057b894a66a58c6d414fcf))
+
+
+### Performance Improvements
+
+* unit tests ([68c8a10](https://github.com/Bugs5382/node-hl7-server/commit/68c8a10b2d23ab377adf5ecaa54e1ea21f33dc8d))
+* unit tests ([0856a07](https://github.com/Bugs5382/node-hl7-server/commit/0856a07d06572f556ee164adef61a5b2fbc40906))
+
 # [1.0.0-beta.7](https://github.com/Bugs5382/node-hl7-server/compare/v1.0.0-beta.6...v1.0.0-beta.7) (2023-12-21)
 
 
