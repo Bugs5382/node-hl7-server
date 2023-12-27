@@ -35,9 +35,10 @@ They might be sans uppercase throughout the documentation, but they would have t
 
 ## Install
 
-Install using NPM into your package.
-
-```npm install node-hl7-server```
+Install using NPM into your package:
+```
+npm install node-hl7-server
+```
 
 It has one external dependency of ```node-hl7-client```
 as it uses this package to generate the acknowledgement message back to the client
