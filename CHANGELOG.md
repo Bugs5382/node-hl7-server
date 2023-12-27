@@ -1,3 +1,11 @@
+## [1.0.1-beta.1](https://github.com/Bugs5382/node-hl7-server/compare/v1.0.0...v1.0.1-beta.1) (2023-12-27)
+
+
+### Bug Fixes
+
+* default export back in the code ([d125a95](https://github.com/Bugs5382/node-hl7-server/commit/d125a95fa1d393fb6b346b12481cb8f6fe5104f2))
+* default export back in the code ([#29](https://github.com/Bugs5382/node-hl7-server/issues/29)) ([a523596](https://github.com/Bugs5382/node-hl7-server/commit/a5235969e8e44e03941ca64fb979477051f08e25))
+
 # 1.0.0 (2023-12-25)
 
 
