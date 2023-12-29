@@ -1,3 +1,11 @@
+## [1.0.1-beta.2](https://github.com/Bugs5382/node-hl7-server/compare/v1.0.1-beta.1...v1.0.1-beta.2) (2023-12-29)
+
+
+### Bug Fixes
+
+* fixed name spelling ([f41e69a](https://github.com/Bugs5382/node-hl7-server/commit/f41e69ab00e076373a0ddf61ba68648bbd210e35))
+* fixed name spelling: Hl7Inbound --> HL7Inbound ([#30](https://github.com/Bugs5382/node-hl7-server/issues/30)) ([16c3dfb](https://github.com/Bugs5382/node-hl7-server/commit/16c3dfba949750533fb235da1ec692aef177fb60))
+
 ## [1.0.1-beta.1](https://github.com/Bugs5382/node-hl7-server/compare/v1.0.0...v1.0.1-beta.1) (2023-12-27)
 
 
