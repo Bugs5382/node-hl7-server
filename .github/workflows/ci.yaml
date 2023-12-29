@@ -47,10 +47,10 @@ jobs:
       - name: Semantic Release (Dry Run)
         run: npm run semantic-release:dry-run
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Semantic Release
         run: npm run semantic-release
         env:
-          GITHUB_TOKEN:  ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN:  ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
