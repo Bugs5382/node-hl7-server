@@ -1,3 +1,10 @@
+# [1.1.0-beta.1](https://github.com/Bugs5382/node-hl7-server/compare/v1.0.1-beta.3...v1.1.0-beta.1) (2023-12-31)
+
+
+### Features
+
+* update node hl7 client ([#35](https://github.com/Bugs5382/node-hl7-server/issues/35)) ([4c385eb](https://github.com/Bugs5382/node-hl7-server/commit/4c385ebf0b59f23c8d224cadbd8591a99b121259))
+
 ## [1.0.1-beta.3](https://github.com/Bugs5382/node-hl7-server/compare/v1.0.1-beta.2...v1.0.1-beta.3) (2023-12-29)
 
 
