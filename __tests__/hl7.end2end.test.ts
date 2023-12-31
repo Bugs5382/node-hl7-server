@@ -98,7 +98,7 @@ describe('node hl7 end to end - server', () => {
         dfd.resolve()
       })
 
-      await expectEvent(OB_ADT, 'connect')
+      await expectEvent(OB_ADT, 'client.connect')
 
       const message = new Message({
         messageHeader: {
@@ -147,7 +147,7 @@ describe('node hl7 end to end - server', () => {
         dfd.resolve()
       })
 
-      await expectEvent(OB_ADT, 'connect')
+      await expectEvent(OB_ADT, 'client.connect')
 
       const message = new Message({
         messageHeader: {
@@ -199,7 +199,7 @@ describe('node hl7 end to end - server', () => {
         dfd.resolve()
       })
 
-      await expectEvent(OB_ADT, 'connect')
+      await expectEvent(OB_ADT, 'client.connect')
 
       const batch = new Batch()
       batch.start()
@@ -255,7 +255,7 @@ describe('node hl7 end to end - server', () => {
         dfd.resolve()
       })
 
-      await expectEvent(OB_ADT, 'connect')
+      await expectEvent(OB_ADT, 'client.connect')
 
       const batch = new Batch()
       batch.start()
@@ -318,7 +318,7 @@ describe('node hl7 end to end - server', () => {
         }
       })
 
-      await expectEvent(OB_ADT, 'connect')
+      await expectEvent(OB_ADT, 'client.connect')
 
       const batch = new Batch()
       batch.start()
@@ -391,7 +391,7 @@ describe('node hl7 end to end - server', () => {
         }
       })
 
-      await expectEvent(OB_ADT, 'connect')
+      await expectEvent(OB_ADT, 'client.connect')
 
       const batch = new Batch()
       batch.start()
@@ -483,7 +483,7 @@ describe('node hl7 end to end - server', () => {
         dfd.resolve()
       })
 
-      await expectEvent(OB_ADT, 'connect')
+      await expectEvent(OB_ADT, 'client.connect')
 
       const fileBatch = await OB_ADT.readFile('temp/hl7.readFileTestMSH.20081231.hl7')
 
@@ -521,7 +521,7 @@ describe('node hl7 end to end - server', () => {
         dfd.resolve()
       })
 
-      await expectEvent(OB_ADT, 'connect')
+      await expectEvent(OB_ADT, 'client.connect')
 
       const fileBatch = await OB_ADT.readFile('temp/hl7.readFileTestMSH.20081231.hl7')
 
@@ -600,7 +600,7 @@ describe('node hl7 end to end - server', () => {
         }
       })
 
-      await expectEvent(OB_ADT, 'connect')
+      await expectEvent(OB_ADT, 'client.connect')
 
       const fileBatch = await OB_ADT.readFile('temp/hl7.readFileTestMSH.20081231.hl7')
 

@@ -84,7 +84,7 @@
     "typescript": "5.3.3"
   },
   "dependencies": {
-    "node-hl7-client": "^1.0.0"
+    "node-hl7-client": "^1.1.0"
   },
   "pre-commit": [
     "build"
