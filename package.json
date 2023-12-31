@@ -1,6 +1,6 @@
 {
   "name": "node-hl7-server",
-  "version": "1.0.0",
+  "version": "1.1.0-beta.1",
   "description": "Node.js client library for creating a HL7 Server which can accept incoming a properly formatted HL7 message(s), and then parses the HL7 message. Once the message has been parsed you can then do something with the final result that you so desire.",
   "module": "./lib/esm/index.js",
   "main": "./lib/cjs/index.js",
@@ -16,14 +16,18 @@
   "files": [
     "lib/"
   ],
+  "engines": {
+    "node": "^18 || ^20"
+  },
   "scripts": {
     "clean": "rm -rf coverage docs lib temp",
     "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && tsc -p tsconfig.types.json && ./bin/build-types.sh",
     "build:watch": "tsc -p tsconfig.esm.json -w",
-    "lint": "ts-standard | snazzy",
-    "lint:fix": "ts-standard --fix | snazzy",
+    "npm:lint": "npmPkgJsonLint .",
+    "lint": "npm run npm:lint && ts-standard | snazzy",
+    "lint:fix": "npm run npm:lint . && ts-standard --fix | snazzy",
     "pack": "npm pack",
-    "prepublishOnly": "npm run clean && npm run build && npm run test:ci && npm run pack",
+    "prepublishOnly": "npm run clean && npm run build && npm run pack",
     "test": "jest",
     "test:open": "jest --detectOpenHandles",
     "test:watch": "jest --watch",
@@ -61,11 +65,12 @@
     "@semantic-release/release-notes-generator": "^12.1.0",
     "@the-rabbit-hole/semantic-release-config": "^1.4.0",
     "@types/jest": "^29.5.11",
-    "@types/node": "^20.10.5",
+    "@types/node": "^20.10.6",
     "@types/tcp-port-used": "^1.0.4",
-    "@typescript-eslint/parser": "^6.15.0",
+    "@typescript-eslint/parser": "^6.16.0",
     "jest": "^29.7.0",
     "jest-ts-webcompat-resolver": "^1.0.0",
+    "npm-package-json-lint": "^7.1.0",
     "portfinder": "^1.0.32",
     "pre-commit": "^1.2.2",
     "semantic-release": "^22.0.12",
@@ -74,14 +79,14 @@
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.2",
     "ts-standard": "^12.0.2",
-    "tsd": "^0.30.0",
+    "tsd": "^0.30.1",
     "typedoc": "^0.25.4",
     "typescript": "5.3.3"
   },
   "dependencies": {
-    "node-hl7-client": "^1.0.0"
+    "node-hl7-client": "^1.1.0"
   },
-  "pre-commit": [
+  "precommit": [
     "build"
   ]
 }

@@ -2,7 +2,7 @@ import EventEmitter from 'events'
 import net, { Socket } from 'net'
 import tls from 'tls'
 import { FileBatch, Batch, Message, isBatch, isFile } from 'node-hl7-client'
-import { CR, FS, VT } from '../utils/constants'
+import { CR, FS, VT } from '../utils/constants.js'
 import { ListenerOptions, normalizeListenerOptions } from '../utils/normalize.js'
 import { InboundRequest } from './modules/inboundRequest.js'
 import { SendResponse } from './modules/sendResponse.js'
@@ -28,7 +28,7 @@ export type InboundHandler = (req: InboundRequest, res: SendResponse) => Promise
  * @since 1.0.0
  * @extends EventEmitter
  */
-export class Hl7Inbound extends EventEmitter {
+export class HL7Inbound extends EventEmitter {
   /** @internal */
   private readonly _handler: (req: InboundRequest, res: SendResponse) => void
   /** @internal */
@@ -60,7 +60,7 @@ export class Hl7Inbound extends EventEmitter {
   }
 
   /** Close Listener Instance.
-   * This be called for each listener, but if the server instance is closed shut down, this will also fire off.
+   * This be called for each listener, but if the server instance is closed and shut down, this will also fire off.
    * @since 1.0.0 */
   async close (): Promise<boolean> {
     this._sockets.forEach((socket) => {
