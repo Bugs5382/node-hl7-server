@@ -86,7 +86,7 @@
   "dependencies": {
     "node-hl7-client": "^1.1.0"
   },
-  "pre-commit": [
+  "precommit": [
     "build"
   ]
 }
