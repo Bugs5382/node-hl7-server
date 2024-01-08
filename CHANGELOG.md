@@ -1,8 +1,14 @@
+
+# [1.1.0-beta.2](https://github.com/Bugs5382/node-hl7-server/compare/v1.1.0-beta.1...v1.1.0-beta.2) (2024-01-08)
+
 # [1.1.0](https://github.com/Bugs5382/node-hl7-server/compare/v1.0.0...v1.1.0) (2023-12-31)
+
 
 
 ### Bug Fixes
 
+
+* update node-hl7-client ([fc84d30](https://github.com/Bugs5382/node-hl7-server/commit/fc84d30779a866e15060d5e9a5e8e2807542ff83))
 * default export back in the code ([d125a95](https://github.com/Bugs5382/node-hl7-server/commit/d125a95fa1d393fb6b346b12481cb8f6fe5104f2))
 * default export back in the code ([#29](https://github.com/Bugs5382/node-hl7-server/issues/29)) ([a523596](https://github.com/Bugs5382/node-hl7-server/commit/a5235969e8e44e03941ca64fb979477051f08e25))
 * fixed ci ([0e61e98](https://github.com/Bugs5382/node-hl7-server/commit/0e61e98673f725d437120acc64820fea466b65b7))
