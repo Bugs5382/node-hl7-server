@@ -1,9 +1,14 @@
-## [1.1.1-beta.1](https://github.com/Bugs5382/node-hl7-server/compare/v1.1.0...v1.1.1-beta.1) (2024-01-08)
+# [1.2.0](https://github.com/Bugs5382/node-hl7-server/compare/v1.1.0...v1.2.0) (2024-01-08)
 
 
 ### Bug Fixes
 
 * update node-hl7-client ([fc84d30](https://github.com/Bugs5382/node-hl7-server/commit/fc84d30779a866e15060d5e9a5e8e2807542ff83))
+
+
+### Features
+
+* update packages ([#38](https://github.com/Bugs5382/node-hl7-server/issues/38)) ([105b9a3](https://github.com/Bugs5382/node-hl7-server/commit/105b9a3e7b9ff1b6878a536abc6756758cbcb934))
 
 # [1.1.0-beta.2](https://github.com/Bugs5382/node-hl7-server/compare/v1.1.0-beta.1...v1.1.0-beta.2) (2024-01-08)
 
