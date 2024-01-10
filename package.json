@@ -1,6 +1,6 @@
 {
   "name": "node-hl7-server",
-  "version": "1.2.0",
+  "version": "1.2.1-beta.1",
   "description": "Node.js client library for creating a HL7 Server which can accept incoming a properly formatted HL7 message(s), and then parses the HL7 message. Once the message has been parsed you can then do something with the final result that you so desire.",
   "module": "./lib/esm/index.js",
   "main": "./lib/cjs/index.js",
