@@ -539,8 +539,8 @@ describe('node hl7 end to end - server', () => {
     let fileName: string
 
     const hl7_string: string[] = [
-      "MSH|^~\\&|||||20081231||ADT^A01^ADT_A01|12345|D|2.7\rEVN||20081231",
-      "MSH|^~\\&|||||20081231||ADT^A01^ADT_A01|12345|D|2.7\rEVN||20081231"
+      'MSH|^~\\&|||||20081231||ADT^A01^ADT_A01|12345|D|2.7\rEVN||20081231',
+      'MSH|^~\\&|||||20081231||ADT^A01^ADT_A01|12345|D|2.7\rEVN||20081231'
     ]
 
     beforeAll(async () => {
@@ -560,7 +560,7 @@ describe('node hl7 end to end - server', () => {
       batch.start()
 
       for (let i = 0; i < hl7_string.length; i++) {
-        const message = new Message({text: hl7_string[i] })
+        const message = new Message({ text: hl7_string[i] })
         batch.add(message)
       }
 
@@ -568,7 +568,7 @@ describe('node hl7 end to end - server', () => {
 
       fileName = batch.toFile('readFileTestMSH', true, 'temp/')
 
-      fs.access(`temp/${fileName as string}`, fs.constants.F_OK, (err) => {
+      fs.access(`temp/${fileName}`, fs.constants.F_OK, (err) => {
         if (err == null) {
           // Do something
         }
@@ -576,7 +576,7 @@ describe('node hl7 end to end - server', () => {
 
       await (async () => {
         try {
-          await fs.promises.access(`temp/${fileName as string}`, fs.constants.F_OK)
+          await fs.promises.access(`temp/${fileName}`, fs.constants.F_OK)
           // Do something
         } catch (err) {
           // Handle error
@@ -616,7 +616,7 @@ describe('node hl7 end to end - server', () => {
 
       await expectEvent(OB_ADT, 'client.connect')
 
-      const fileBatch = await OB_ADT.readFile(`temp/${fileName as string}`)
+      const fileBatch = await OB_ADT.readFile(`temp/${fileName}`)
 
       await OB_ADT.sendMessage(fileBatch)
 

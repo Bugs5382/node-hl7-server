@@ -49,7 +49,7 @@ export class HL7Inbound extends EventEmitter {
    */
   constructor (server: Server, props: ListenerOptions, handler: InboundHandler) {
     super()
-    this._handler = handler
+    this._handler = handler // eslint-disable-line @typescript-eslint/no-misused-promises
     this._main = server
     this._opt = normalizeListenerOptions(props)
     this._sockets = []
@@ -129,7 +129,18 @@ export class HL7Inbound extends EventEmitter {
           // send raw information to the emit
           this.emit('data.raw', loadedMessage)
 
-          if (isBatch(loadedMessage)) {
+          if (isFile(loadedMessage)) {
+            // parser the batch
+            parser = new FileBatch({ text: loadedMessage })
+            // load the messages
+            const allMessage = parser.messages()
+            allMessage.forEach((message: Message) => {
+              const messageParsed = new Message({ text: message.toString() })
+              const req = new InboundRequest(messageParsed, { type: 'file' })
+              const res = new SendResponse(socket, message)
+              this._handler(req, res)
+            })
+          } else if (isBatch(loadedMessage)) {
             // parser the batch
             parser = new Batch({ text: loadedMessage })
             // load the messages
@@ -138,17 +149,6 @@ export class HL7Inbound extends EventEmitter {
             allMessage.forEach((message: Message) => {
               const messageParsed = new Message({ text: message.toString() })
               const req = new InboundRequest(messageParsed, { type: 'batch' })
-              const res = new SendResponse(socket, message)
-              this._handler(req, res)
-            })
-          } else if (isFile(loadedMessage)) {
-            // parser the batch
-            parser = new FileBatch({ text: loadedMessage })
-            // load the messages
-            const allMessage = parser.messages()
-            allMessage.forEach((message: Message) => {
-              const messageParsed = new Message({ text: message.toString() })
-              const req = new InboundRequest(messageParsed, { type: 'file' })
               const res = new SendResponse(socket, message)
               this._handler(req, res)
             })
