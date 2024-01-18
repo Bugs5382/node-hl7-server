@@ -1,3 +1,11 @@
+## [1.2.3-beta.1](https://github.com/Bugs5382/node-hl7-server/compare/v1.2.2...v1.2.3-beta.1) (2024-01-18)
+
+
+### Bug Fixes
+
+* added .js ([77607ab](https://github.com/Bugs5382/node-hl7-server/commit/77607abc66dd00baf10c834d1e685d93acde5540))
+* error err module not found ([#44](https://github.com/Bugs5382/node-hl7-server/issues/44)) ([99ec3db](https://github.com/Bugs5382/node-hl7-server/commit/99ec3dbca10f85d133af043ba63481bc86e3e4ac))
+
 ## [1.2.2](https://github.com/Bugs5382/node-hl7-server/compare/v1.2.1...v1.2.2) (2024-01-11)
 
 
