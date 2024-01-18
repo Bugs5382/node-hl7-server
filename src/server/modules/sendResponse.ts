@@ -1,6 +1,6 @@
 import { Socket } from 'net'
 import { createHL7Date, Message, randomString } from 'node-hl7-client'
-import { CR, FS, VT } from '../../utils/constants'
+import { CR, FS, VT } from '../../utils/constants.js'
 
 /**
  * Send Response
