@@ -6,7 +6,7 @@ class HL7Error extends Error {
   /** @internal */
   constructor (code: number, message: string) {
     super(message)
-    this.name = 'HL7Error'
+    this.name = 'HL7ServerError'
     this.code = code
   }
 }
@@ -16,11 +16,14 @@ class HL7Error extends Error {
 export class HL7ServerError extends HL7Error {
   /** @internal */
   name = 'HL7ServerError'
+  constructor (message: string) {
+    super(500, message)
+  }
 }
 
 /** Listener Error
  * @since 1.0.0 */
-export class HL7ListenerError extends HL7Error {
+export class HL7ListenerError extends Error {
   /** @internal */
   name = 'HL7ListenerError'
 }

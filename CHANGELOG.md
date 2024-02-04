@@ -1,11 +1,39 @@
-## [1.2.3](https://github.com/Bugs5382/node-hl7-server/compare/v1.2.2...v1.2.3) (2024-01-18)
+# [2.0.0-beta.4](https://github.com/Bugs5382/node-hl7-server/compare/v2.0.0-beta.3...v2.0.0-beta.4) (2024-02-04)
 
 
 ### Bug Fixes
 
-* added .js ([77607ab](https://github.com/Bugs5382/node-hl7-server/commit/77607abc66dd00baf10c834d1e685d93acde5540))
-* error err module not found ([#44](https://github.com/Bugs5382/node-hl7-server/issues/44)) ([99ec3db](https://github.com/Bugs5382/node-hl7-server/commit/99ec3dbca10f85d133af043ba63481bc86e3e4ac))
 * imports ([#45](https://github.com/Bugs5382/node-hl7-server/issues/45)) ([1e5165a](https://github.com/Bugs5382/node-hl7-server/commit/1e5165aad448afbf8775a18598dc19749182d1dd))
+
+# [2.0.0-beta.3](https://github.com/Bugs5382/node-hl7-server/compare/v2.0.0-beta.2...v2.0.0-beta.3) (2024-02-04)
+
+
+### Features
+
+* simple docker ([38d13ae](https://github.com/Bugs5382/node-hl7-server/commit/38d13aef449aaf8fc65c60450df0d54efaa0d2d5))
+* simple docker ([#49](https://github.com/Bugs5382/node-hl7-server/issues/49)) ([93928ec](https://github.com/Bugs5382/node-hl7-server/commit/93928ecc95c116de9438d480c4706f6cf50c026a))
+
+# [2.0.0-beta.2](https://github.com/Bugs5382/node-hl7-server/compare/v2.0.0-beta.1...v2.0.0-beta.2) (2024-02-04)
+
+
+### Features
+
+* added stats ([cd4d345](https://github.com/Bugs5382/node-hl7-server/commit/cd4d34505bd0d62f6d9c3bdbc5b5cb10e801caa9))
+* added stats ([#48](https://github.com/Bugs5382/node-hl7-server/issues/48)) ([83365d2](https://github.com/Bugs5382/node-hl7-server/commit/83365d2f9d679217019fb8cfd1307b9f08573c20))
+
+# [2.0.0-beta.1](https://github.com/Bugs5382/node-hl7-server/compare/v1.2.3-beta.1...v2.0.0-beta.1) (2024-02-04)
+
+
+### Features
+
+* updates ([7f855d2](https://github.com/Bugs5382/node-hl7-server/commit/7f855d246933ce81fcb9aa682ea203b0a471f63b))
+* updates ([#47](https://github.com/Bugs5382/node-hl7-server/issues/47)) ([f93d765](https://github.com/Bugs5382/node-hl7-server/commit/f93d7652d212a5a7a71d3b9e2908dce8e563dbbc))
+
+
+### BREAKING CHANGES
+
+* - node 20
+- updated to node-hl7-client to 2.0.0
 
 ## [1.2.3-beta.1](https://github.com/Bugs5382/node-hl7-server/compare/v1.2.2...v1.2.3-beta.1) (2024-01-18)
 

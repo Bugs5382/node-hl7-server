@@ -71,18 +71,18 @@ export function normalizeServerOptions (raw?: ServerOptions): ServerOptions {
   const props: any = { ...DEFAULT_SERVER_OPTS, ...raw }
 
   if (props.ipv4 === true && props.ipv6 === true) {
-    throw new HL7ServerError(500, 'ipv4 and ipv6 both can\'t be set to be exclusive.')
+    throw new HL7ServerError('ipv4 and ipv6 both can\'t be set to be exclusive.')
   }
 
   if (typeof props.bindAddress !== 'string') {
-    throw new HL7ServerError(500, 'bindAddress is not valid string.')
+    throw new HL7ServerError('bindAddress is not valid string.')
   } else if (props.bindAddress !== 'localhost') {
     if (typeof props.bindAddress !== 'undefined' && props.ipv6 === true && !validIPv6(props.bindAddress)) {
-      throw new HL7ServerError(500, 'bindAddress is an invalid ipv6 address.')
+      throw new HL7ServerError('bindAddress is an invalid ipv6 address.')
     }
 
     if (typeof props.bindAddress !== 'undefined' && props.ipv4 === true && !validIPv4(props.bindAddress)) {
-      throw new HL7ServerError(500, 'bindAddress is an invalid ipv4 address.')
+      throw new HL7ServerError('bindAddress is an invalid ipv4 address.')
     }
   }
 
@@ -99,16 +99,16 @@ export function normalizeListenerOptions (raw?: ListenerOptions): ValidatedOptio
     props.name = randomString()
   } else {
     if (nameFormat.test(props.name)) {
-      throw new HL7ListenerError(500, 'name must not contain certain characters: `!@#$%^&*()+\\-=\\[\\]{};\':"\\\\|,.<>\\/?~.')
+      throw new HL7ListenerError('name must not contain certain characters: `!@#$%^&*()+\\-=\\[\\]{};\':"\\\\|,.<>\\/?~.')
     }
   }
 
   if (typeof props.port === 'undefined') {
-    throw new HL7ListenerError(404, 'port is not defined.')
+    throw new HL7ListenerError('port is not defined.')
   }
 
   if (typeof props.port !== 'number') {
-    throw new HL7ListenerError(500, 'port is not valid number.')
+    throw new HL7ListenerError('port is not valid number.')
   }
 
   assertNumber(props, 'port', 0, 65353)
