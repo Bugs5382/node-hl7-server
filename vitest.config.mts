@@ -5,6 +5,7 @@ export default defineConfig({
     coverage: {
       exclude: [
         '__tests__/__utils__/**',
+        'docker',
         'bin',
         'certs',
         'docs',
