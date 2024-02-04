@@ -1,3 +1,11 @@
+# [2.0.0-beta.3](https://github.com/Bugs5382/node-hl7-server/compare/v2.0.0-beta.2...v2.0.0-beta.3) (2024-02-04)
+
+
+### Features
+
+* simple docker ([38d13ae](https://github.com/Bugs5382/node-hl7-server/commit/38d13aef449aaf8fc65c60450df0d54efaa0d2d5))
+* simple docker ([#49](https://github.com/Bugs5382/node-hl7-server/issues/49)) ([93928ec](https://github.com/Bugs5382/node-hl7-server/commit/93928ecc95c116de9438d480c4706f6cf50c026a))
+
 # [2.0.0-beta.2](https://github.com/Bugs5382/node-hl7-server/compare/v2.0.0-beta.1...v2.0.0-beta.2) (2024-02-04)
 
 
