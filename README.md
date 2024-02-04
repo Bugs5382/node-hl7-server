@@ -103,6 +103,21 @@ Then you can query the segment ```MSH.12``` in this instance and get its result.
 
 Please consult [node-hl7-client](https://www.npmjs.com/package/node-hl7-client) documentation for further ways to parse the message segment.
 
+## Docker
+
+```
+npm run docker:build
+```
+
+This package, if you download from source,
+comes with a DockerFile to build a simple docker image with a basic node-hl7-server running.
+All the server does is respond "success" to all properly formatted HL7 messages. 
+
+If you want more a custom instance of this server, download the GIT,
+and modify ```docker/server.js``` to your liking and then build the docker image and run it.
+
+Suggestions? Open a PR!
+
 ## Acknowledgements
 
 - Code Design/Auto Re-Connect/Resend, Inspiration: [node-rabbitmq-client](https://github.com/cody-greene/node-rabbitmq-client)
