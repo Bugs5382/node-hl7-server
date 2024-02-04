@@ -2,7 +2,7 @@ import EventEmitter from 'events'
 import net, { Socket } from 'net'
 import tls from 'tls'
 import { FileBatch, Batch, Message, isBatch, isFile } from 'node-hl7-client'
-import { CR, FS, VT } from '../utils/constants.js'
+import { PROTOCOL_MLLP_FOOTER, PROTOCOL_MLLP_HEADER } from '../utils/constants.js'
 import { ListenerOptions, normalizeListenerOptions } from '../utils/normalize.js'
 import { InboundRequest } from './modules/inboundRequest.js'
 import { SendResponse } from './modules/sendResponse.js'
@@ -21,14 +21,33 @@ import { Server } from './server.js'
  *  })
  *```
  */
-export type InboundHandler = (req: InboundRequest, res: SendResponse) => Promise<void>
+export type InboundHandler = (req: InboundRequest, res: SendResponse) => Promise<void> | void
+
+/* eslint-disable */
+export interface Inbound extends EventEmitter {
+  /** When the connection form the client is closed. We might have an error, we might not. */
+  on(name: 'client.close', cb: (hasError: boolean) => void): this;
+  /** When a connection from the client is made. */
+  on(name: 'client.connect', cb: (socket: Socket) => void): this;
+  /** When an error was sent by the connecting source. */
+  on(name: 'client.error', cb: (err: any) => void): this;
+  /** Something wrong happened during data parsing. */
+  on(name: 'data.error', cb: (err: any) => void): this;
+  /** The raw data received by this particular inbound connection. */
+  on(name: 'data.raw', cb: (rawData: string) => void): this;
+  /** When the socket itself has an error. */
+  on(name: 'error', cb: (err: any) => void): this;
+  /** When the socket is ready and listening on the port. */
+  on(name: 'listen', cb: () => void): this;
+}
+/* eslint-enable */
 
 /**
- * Listener Class
+ * Inbound Listener Class
  * @since 1.0.0
  * @extends EventEmitter
  */
-export class HL7Inbound extends EventEmitter {
+export class Inbound extends EventEmitter implements Inbound {
   /** @internal */
   private readonly _handler: (req: InboundRequest, res: SendResponse) => void
   /** @internal */
@@ -113,15 +132,17 @@ export class HL7Inbound extends EventEmitter {
     // set encoding
     socket.setEncoding(this._opt.encoding)
 
-    socket.on('data', data => {
+    socket.on('data', (buffer) => {
+      socket.cork()
+
       try {
         // set message
-        loadedMessage = data.toString().replace(VT, '')
+        loadedMessage = buffer.toString().replace(PROTOCOL_MLLP_HEADER, '')
 
         // is there is F5 and CR in this message?
-        if (loadedMessage.includes(FS + CR)) {
+        if (loadedMessage.includes(PROTOCOL_MLLP_FOOTER)) {
           // strip them out
-          loadedMessage = loadedMessage.replace(FS + CR, '')
+          loadedMessage = loadedMessage.replace(PROTOCOL_MLLP_FOOTER, '')
 
           // parser either is batch or a message
           let parser: FileBatch | Batch | Message
@@ -163,6 +184,8 @@ export class HL7Inbound extends EventEmitter {
       } catch (err) {
         this.emit('data.error', err)
       }
+
+      socket.uncork()
     })
 
     socket.on('error', err => {
