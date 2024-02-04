@@ -1,0 +1,32 @@
+{
+  "name": "docker-hl7-server",
+  "version": "1.0.0",
+  "main": "server.js",
+  "private": true,
+  "scripts": {
+    "server": "node server.js"
+  },
+  "description": "Simple Server running on Docker",
+  "author": "Shane Froebel",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Bugs5382/node-hl7-server/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bugs5382/node-hl7-server.git"
+  },
+  "keywords": [
+    "hl7",
+    "hl7-parser",
+    "hl7-client",
+    "hl7-server",
+    "hl7-builder",
+    "hl7-speffications",
+    "hl7-validation"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "homepage": "https://github.com/Bugs5382/node-hl7-server#readme"
+}
