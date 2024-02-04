@@ -1,3 +1,11 @@
+# [2.0.0-beta.2](https://github.com/Bugs5382/node-hl7-server/compare/v2.0.0-beta.1...v2.0.0-beta.2) (2024-02-04)
+
+
+### Features
+
+* added stats ([cd4d345](https://github.com/Bugs5382/node-hl7-server/commit/cd4d34505bd0d62f6d9c3bdbc5b5cb10e801caa9))
+* added stats ([#48](https://github.com/Bugs5382/node-hl7-server/issues/48)) ([83365d2](https://github.com/Bugs5382/node-hl7-server/commit/83365d2f9d679217019fb8cfd1307b9f08573c20))
+
 # [2.0.0-beta.1](https://github.com/Bugs5382/node-hl7-server/compare/v1.2.3-beta.1...v2.0.0-beta.1) (2024-02-04)
 
 
