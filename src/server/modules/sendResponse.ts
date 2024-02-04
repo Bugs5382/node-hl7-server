@@ -14,13 +14,10 @@ export class SendResponse extends EventEmitter {
   private readonly _socket: Socket
   /** @internal */
   private readonly _message: Message
-  /** @internal */
-  private _ackSent: boolean
 
   constructor (socket: Socket, message: Message) {
     super()
     this._ack = undefined
-    this._ackSent = false
     this._message = message
     this._socket = socket
   }
@@ -44,7 +41,7 @@ export class SendResponse extends EventEmitter {
    * ```
    * "AE" (Application Error) will be sent if there is a problem creating either an "AA" or "AR" message from the orginial message sent.
    */
-  async sendResponse (type: 'AA' | 'AR'): Promise<boolean> {
+  async sendResponse (type: 'AA' | 'AR'): Promise<void> {
     try {
       this._ack = this._createAckMessage(type, this._message)
       this._socket.write(Buffer.from(`${PROTOCOL_MLLP_HEADER}${this._ack.toString()}${PROTOCOL_MLLP_FOOTER}`))
@@ -53,9 +50,8 @@ export class SendResponse extends EventEmitter {
       this._socket.write(Buffer.from(`${PROTOCOL_MLLP_HEADER}${this._ack.toString()}${PROTOCOL_MLLP_FOOTER}`))
     }
 
-    this._ackSent = true
-
-    return this._ackSent
+    // we are sending a response back, why not?
+    this.emit('response.sent')
   }
 
   /** @internal */

@@ -21,7 +21,7 @@ import { Server } from './server.js'
  *  })
  *```
  */
-export type InboundHandler = (req: InboundRequest, res: SendResponse) => Promise<void> | void
+export type InboundHandler = (req: InboundRequest, res: SendResponse) => void
 
 /* eslint-disable */
 export interface Inbound extends EventEmitter {
@@ -39,6 +39,8 @@ export interface Inbound extends EventEmitter {
   on(name: 'error', cb: (err: any) => void): this;
   /** When the socket is ready and listening on the port. */
   on(name: 'listen', cb: () => void): this;
+  /** An HL7 response was sent */
+  on(name: 'response.sent', cb: () => void): this;
 }
 /* eslint-enable */
 
@@ -58,6 +60,15 @@ export class Inbound extends EventEmitter implements Inbound {
   private readonly _socket: net.Server | tls.Server
   /** @internal */
   private readonly _sockets: Socket[]
+  /** @internal */
+  readonly stats = {
+    /** Total message received to server.
+     * @since 2.0.0 */
+    received: 0,
+    /** Total message parsed by the server..
+     * @since 2.0.0 */
+    totalMessage: 0
+  }
 
   /**
    * Build a Listener
@@ -68,13 +79,17 @@ export class Inbound extends EventEmitter implements Inbound {
    */
   constructor (server: Server, props: ListenerOptions, handler: InboundHandler) {
     super()
-    this._handler = handler // eslint-disable-line @typescript-eslint/no-misused-promises
+
+    this._handler = handler
     this._main = server
+
     this._opt = normalizeListenerOptions(props)
+
     this._sockets = []
 
     this._listen = this._listen.bind(this)
     this._onTcpClientConnected = this._onTcpClientConnected.bind(this)
+
     this._socket = this._listen()
   }
 
@@ -135,6 +150,9 @@ export class Inbound extends EventEmitter implements Inbound {
     socket.on('data', (buffer) => {
       socket.cork()
 
+      // we got a message, we don't care if it's good or not
+      ++this.stats.received
+
       try {
         // set message
         loadedMessage = buffer.toString().replace(PROTOCOL_MLLP_HEADER, '')
@@ -156,10 +174,19 @@ export class Inbound extends EventEmitter implements Inbound {
             // load the messages
             const allMessage = parser.messages()
             allMessage.forEach((message: Message) => {
+              // parse this message
               const messageParsed = new Message({ text: message.toString() })
+              // increase the total message
+              ++this.stats.totalMessage
+              // create the inbound request
               const req = new InboundRequest(messageParsed, { type: 'file' })
+              // create the send response function
               const res = new SendResponse(socket, message)
-              this._handler(req, res)
+              // on a response sent, tell the inbound listener
+              res.on('response.sent', () => {
+                this.emit('response.sent')
+              })
+              void this._handler(req, res)
             })
           } else if (isBatch(loadedMessage)) {
             // parser the batch
@@ -168,17 +195,28 @@ export class Inbound extends EventEmitter implements Inbound {
             const allMessage = parser.messages()
             // loop messages
             allMessage.forEach((message: Message) => {
+              // parse this message
               const messageParsed = new Message({ text: message.toString() })
-              const req = new InboundRequest(messageParsed, { type: 'batch' })
+              // increase the total message
+              ++this.stats.totalMessage
+              // create the inbound request
+              const req = new InboundRequest(messageParsed, { type: 'file' })
+              // create the send response function
               const res = new SendResponse(socket, message)
-              this._handler(req, res)
+              // on a response sent, tell the inbound listener
+              void this._handler(req, res)
             })
           } else {
-            // parse the message
-            const message = new Message({ text: loadedMessage })
-            const req = new InboundRequest(message, { type: 'message' })
-            const res = new SendResponse(socket, message)
-            this._handler(req, res)
+            // parse this message
+            const messageParsed = new Message({ text: loadedMessage })
+            // increase the total message
+            ++this.stats.totalMessage
+            // create the inbound request
+            const req = new InboundRequest(messageParsed, { type: 'file' })
+            // create the send response function
+            const res = new SendResponse(socket, messageParsed)
+            // on a response sent, tell the inbound listener
+            void this._handler(req, res)
           }
         }
       } catch (err) {
