@@ -1,3 +1,10 @@
+# [2.0.0-beta.4](https://github.com/Bugs5382/node-hl7-server/compare/v2.0.0-beta.3...v2.0.0-beta.4) (2024-02-04)
+
+
+### Bug Fixes
+
+* imports ([#45](https://github.com/Bugs5382/node-hl7-server/issues/45)) ([1e5165a](https://github.com/Bugs5382/node-hl7-server/commit/1e5165aad448afbf8775a18598dc19749182d1dd))
+
 # [2.0.0-beta.3](https://github.com/Bugs5382/node-hl7-server/compare/v2.0.0-beta.2...v2.0.0-beta.3) (2024-02-04)
 
 
