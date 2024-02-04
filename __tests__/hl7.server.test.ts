@@ -1,7 +1,27 @@
 import { describe, expect, test } from 'vitest';
-import { InboundRequest, Server } from '../src'
+import {HL7ListenerError, InboundRequest, Server} from '../src'
 
 describe('node hl7 server', () => {
+
+  describe('sanity tests - modules', () => {
+    test('InboundRequest - message undefined', async () => {
+      // @ts-expect-error
+      const empty = new InboundRequest(undefined, { type: 'file' })
+      try {
+        empty.getMessage()
+      } catch (e) {
+        expect(e).toStrictEqual(new HL7ListenerError('Message is not defined.'))
+      }
+    })
+
+    test('InboundRequest - type check', async () => {
+      // @ts-expect-error
+      const req = new InboundRequest('', { type: 'file' })
+      expect(req.getType()).toBe('file')
+    })
+
+  })
+
   describe('sanity tests - server class', () => {
     test('error - bindAddress has to be string', async () => {
       try {
