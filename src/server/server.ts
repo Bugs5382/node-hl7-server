@@ -1,5 +1,5 @@
 import EventEmitter from 'events'
-import { HL7Inbound, InboundHandler } from './HL7Inbound.js'
+import { Inbound, InboundHandler } from './inbound.js'
 import { ServerOptions, normalizeServerOptions, ListenerOptions } from '../utils/normalize.js'
 
 /**
@@ -57,7 +57,7 @@ export class Server extends EventEmitter {
    *```
    *
    * */
-  createInbound (props: ListenerOptions, cb: InboundHandler): HL7Inbound {
-    return new HL7Inbound(this, props, cb)
+  createInbound (props: ListenerOptions, cb: InboundHandler): Inbound {
+    return new Inbound(this, props, cb)
   }
 }

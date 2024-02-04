@@ -1,12 +1,13 @@
+import EventEmitter from 'events'
 import { Socket } from 'net'
-import { createHL7Date, Message, randomString } from 'node-hl7-client'
-import { CR, FS, VT } from '../../utils/constants.js'
+import { Message, randomString } from 'node-hl7-client'
+import { PROTOCOL_MLLP_FOOTER, PROTOCOL_MLLP_HEADER } from '../../utils/constants.js'
 
 /**
  * Send Response
  * @since 1.0.0
  */
-export class SendResponse {
+export class SendResponse extends EventEmitter {
   /** @internal */
   private _ack: Message | undefined
   /** @internal */
@@ -17,6 +18,7 @@ export class SendResponse {
   private _ackSent: boolean
 
   constructor (socket: Socket, message: Message) {
+    super()
     this._ack = undefined
     this._ackSent = false
     this._message = message
@@ -45,10 +47,10 @@ export class SendResponse {
   async sendResponse (type: 'AA' | 'AR'): Promise<boolean> {
     try {
       this._ack = this._createAckMessage(type, this._message)
-      this._socket.write(Buffer.from(`${VT}${this._ack.toString()}${FS}${CR}`))
+      this._socket.write(Buffer.from(`${PROTOCOL_MLLP_HEADER}${this._ack.toString()}${PROTOCOL_MLLP_FOOTER}`))
     } catch (_e: any) {
       this._ack = this._createAEAckMessage()
-      this._socket.write(Buffer.from(`${VT}${this._ack.toString()}${FS}${CR}`))
+      this._socket.write(Buffer.from(`${PROTOCOL_MLLP_HEADER}${this._ack.toString()}${PROTOCOL_MLLP_FOOTER}`))
     }
 
     this._ackSent = true
@@ -62,7 +64,7 @@ export class SendResponse {
       messageHeader: {
         msh_9_1: 'ACK',
         msh_9_2: message.get('MSH.9.2').toString(),
-        msh_10: `ACK${createHL7Date(new Date())}`,
+        msh_10: 'ACK',
         msh_11_1: message.get('MSH.11.1').toString() as 'P' | 'D' | 'T'
       }
     })
@@ -87,9 +89,9 @@ export class SendResponse {
         msh_9_1: 'ACK',
         // There is no 9.2 for ACK a failure.
         // There should be.
-        // So we are using Z99 which is not assigned yet.
+        // So we are using Z99, which is not assigned yet.
         msh_9_2: 'Z99',
-        msh_10: `ACK${createHL7Date(new Date())}`,
+        msh_10: 'ACK',
         msh_11_1: 'P'
       }
     })

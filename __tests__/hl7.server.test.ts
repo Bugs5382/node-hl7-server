@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { InboundRequest, Server } from '../src'
 
 describe('node hl7 server', () => {

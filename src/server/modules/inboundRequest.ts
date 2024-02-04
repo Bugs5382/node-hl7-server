@@ -37,7 +37,7 @@ export class InboundRequest {
     if (typeof this._message !== 'undefined') {
       return this._message
     }
-    throw new HL7ListenerError(500, 'Message is not defined.')
+    throw new HL7ListenerError('Message is not defined.')
   }
 
   getType (): string {
