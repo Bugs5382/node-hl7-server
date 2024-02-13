@@ -1,3 +1,22 @@
+# [2.0.0](https://github.com/Bugs5382/node-hl7-server/compare/v1.2.3...v2.0.0) (2024-02-04)
+
+
+### Features
+
+* added stats ([cd4d345](https://github.com/Bugs5382/node-hl7-server/commit/cd4d34505bd0d62f6d9c3bdbc5b5cb10e801caa9))
+* added stats ([#48](https://github.com/Bugs5382/node-hl7-server/issues/48)) ([83365d2](https://github.com/Bugs5382/node-hl7-server/commit/83365d2f9d679217019fb8cfd1307b9f08573c20))
+* simple docker ([38d13ae](https://github.com/Bugs5382/node-hl7-server/commit/38d13aef449aaf8fc65c60450df0d54efaa0d2d5))
+* simple docker ([#49](https://github.com/Bugs5382/node-hl7-server/issues/49)) ([93928ec](https://github.com/Bugs5382/node-hl7-server/commit/93928ecc95c116de9438d480c4706f6cf50c026a))
+* updates ([7f855d2](https://github.com/Bugs5382/node-hl7-server/commit/7f855d246933ce81fcb9aa682ea203b0a471f63b))
+* updates ([#47](https://github.com/Bugs5382/node-hl7-server/issues/47)) ([f93d765](https://github.com/Bugs5382/node-hl7-server/commit/f93d7652d212a5a7a71d3b9e2908dce8e563dbbc))
+* v2.0.0 ([#51](https://github.com/Bugs5382/node-hl7-server/issues/51)) ([9fcd9f6](https://github.com/Bugs5382/node-hl7-server/commit/9fcd9f67123631c8b3ab847e74adfbcf986618f0))
+
+
+### BREAKING CHANGES
+
+* - node 20
+- updated to node-hl7-client to 2.0.0
+
 # [2.0.0-beta.4](https://github.com/Bugs5382/node-hl7-server/compare/v2.0.0-beta.3...v2.0.0-beta.4) (2024-02-04)
 
 
