@@ -1,6 +1,6 @@
 const { Server } = require('node-hl7-server')
 
-const server = new Server({ bindAddress: 'localhost' })
+const server = new Server({ bindAddress: '0.0.0.0' })
 
 const inbound = server.createInbound({ port: 3000 }, async (req, res) => {
   await res.sendResponse('AA')
