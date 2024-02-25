@@ -1,5 +1,5 @@
 const { Server } = require('node-hl7-server')
-const fs= require('node:fs')
+const fs = require('node:fs')
 const path = require('node:path')
 
 const server = new Server({
