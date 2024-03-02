@@ -1,10 +1,10 @@
 {
   "name": "docker-hl7-server",
   "version": "1.0.0",
-  "main": "server.js",
   "private": true,
   "scripts": {
-    "server": "node server.js"
+    "server": "node server.js",
+    "server:tls": "node tls.server.js"
   },
   "description": "Simple Server running on Docker",
   "author": "Shane Froebel",
