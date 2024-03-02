@@ -23,7 +23,7 @@
     "clean": "rm -rf coverage docs lib temp",
     "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && tsc -p tsconfig.types.json && ./bin/build-types.sh",
     "build:watch": "tsc -p tsconfig.esm.json -w",
-    "docker:build": "docker build -t docker-hl7-server:latest .",
+    "docker:build": "docker build -t docker-node-hl7-server:latest .",
     "npm:lint": "npmPkgJsonLint .",
     "lint": "npm run npm:lint && ts-standard | snazzy",
     "lint:fix": "npm run npm:lint . && ts-standard --fix | snazzy",

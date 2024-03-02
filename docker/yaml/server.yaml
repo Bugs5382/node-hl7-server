@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hl7-server
+  namespace: hl7-server
+spec:
+  ports:
+    - name: 6000-tcp
+      port: 6000
+      protocol: TCP
+      targetPort: 3000
+  selector:
+    app: hl7-server
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hl7-server
+  namespace: hl7-server
+spec:
+  selector:
+    matchLabels:
+      app: hl7-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hl7-server
+    spec:
+      containers:
+        - name: hl7-server
+          command: ["npm"]
+          args: ["run", "server"]
+          image: docker-node-hl7-server:latest
+          ports:
+            - containerPort: 3000
+          imagePullPolicy: IfNotPresent

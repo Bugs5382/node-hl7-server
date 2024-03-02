@@ -1,6 +1,15 @@
 const { Server } = require('node-hl7-server')
+const fs = require('node:fs')
+const path = require('node:path')
 
-const server = new Server({ bindAddress: '0.0.0.0' })
+const server = new Server({
+  bindAddress: 'localhost',
+  tls: {
+    key: fs.readFileSync(path.join('certs/', 'server-key.pem')),
+    cert: fs.readFileSync(path.join('certs/', 'server-crt.pem')),
+    rejectUnauthorized: false
+  }
+})
 
 const inbound = server.createInbound({ port: 3000 }, async (req, res) => {
   await res.sendResponse('AA')
