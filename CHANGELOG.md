@@ -1,3 +1,12 @@
+# [2.1.0-beta.1](https://github.com/Bugs5382/node-hl7-server/compare/v2.0.0...v2.1.0-beta.1) (2024-03-02)
+
+
+### Features
+
+* added docker stuff ([f1a4140](https://github.com/Bugs5382/node-hl7-server/commit/f1a4140402be07ba5745e7d386295aade8aec4ff))
+* added docker stuff ([#57](https://github.com/Bugs5382/node-hl7-server/issues/57)) ([1052745](https://github.com/Bugs5382/node-hl7-server/commit/10527455154f587a2a020e71cd5e8e9168b0c4c6))
+* bind to 0.0.0.0 ([9f8c088](https://github.com/Bugs5382/node-hl7-server/commit/9f8c088361c3c6953e2db537e377c90904847a8b))
+
 # [2.0.0](https://github.com/Bugs5382/node-hl7-server/compare/v1.2.3...v2.0.0) (2024-02-04)
 
 
