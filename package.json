@@ -61,7 +61,7 @@
   "homepage": "https://github.com/Bugs5382/node-hl7-server#readme",
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/commit-analyzer": "^11.1.0",
+    "@semantic-release/commit-analyzer": "^12.0.0",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/release-notes-generator": "^12.1.0",
     "@the-rabbit-hole/semantic-release-config": "^1.5.0",
