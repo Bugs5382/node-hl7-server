@@ -19,6 +19,8 @@ describe('node hl7 end to end - client', () => {
         const messageReq = req.getMessage()
         expect(messageReq.get('MSH.12').toString()).toBe('2.7')
         await res.sendResponse('AA')
+        const messageRes = res.getAckMessage()
+        expect(messageRes?.get('MSA.1').toString()).toBe('AA')
       })
 
       await expectEvent(listener, 'listen')
@@ -67,6 +69,8 @@ describe('node hl7 end to end - client', () => {
         const messageReq = req.getMessage()
         expect(messageReq.get('MSH.12').toString()).toBe('2.7')
         await res.sendResponse('AA')
+        const messageRes = res.getAckMessage()
+        expect(messageRes?.get('MSA.1').toString()).toBe('AA')
       })
 
       await expectEvent(listener, 'listen')
@@ -127,6 +131,8 @@ describe('node hl7 end to end - client', () => {
           const messageReq = req.getMessage()
           expect(messageReq.get('MSH.12').toString()).toBe('2.7')
           await res.sendResponse('AA')
+          const messageRes = res.getAckMessage()
+          expect(messageRes?.get('MSA.1').toString()).toBe('AA')
         })
 
         await expectEvent(inbound, 'listen')
@@ -194,6 +200,8 @@ describe('node hl7 end to end - client', () => {
           const messageReq = req.getMessage()
           expect(messageReq.get('MSH.12').toString()).toBe('2.7')
           await res.sendResponse('AA')
+          const messageRes = res.getAckMessage()
+          expect(messageRes?.get('MSA.1').toString()).toBe('AA')
         })
 
         await expectEvent(inbound, 'listen')

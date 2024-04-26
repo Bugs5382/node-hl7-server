@@ -54,6 +54,16 @@ export class SendResponse extends EventEmitter {
     this.emit('response.sent')
   }
 
+  /**
+   * Get the Ack Message
+   * @since 2.2.0
+   * @description Get the acknowledged message that was sent to the client.
+   * This could return undefined if accessed prior to sending the response
+   */
+  getAckMessage(): Message | undefined {
+    return this._ack
+  }
+
   /** @internal */
   private _createAckMessage (type: string, message: Message): Message {
     const ackMessage = new Message({
