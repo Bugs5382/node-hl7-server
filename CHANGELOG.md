@@ -1,3 +1,10 @@
+# [2.2.0-beta.1](https://github.com/Bugs5382/node-hl7-server/compare/v2.1.0...v2.2.0-beta.1) (2024-04-30)
+
+
+### Features
+
+* add getAckMessage ([c2d5442](https://github.com/Bugs5382/node-hl7-server/commit/c2d544212c97c52bd0adf9820343deb2241b70e6)), closes [#61](https://github.com/Bugs5382/node-hl7-server/issues/61)
+* res.getackmessage() is not defined ([#69](https://github.com/Bugs5382/node-hl7-server/issues/69)) ([d37aaff](https://github.com/Bugs5382/node-hl7-server/commit/d37aaff486ed38441b244611f921cec87927fe44))
 
 # [2.1.0-beta.3](https://github.com/Bugs5382/node-hl7-server/compare/v2.1.0-beta.2...v2.1.0-beta.3) (2024-04-30)
 # [2.1.0](https://github.com/Bugs5382/node-hl7-server/compare/v2.0.0...v2.1.0) (2024-03-02)
