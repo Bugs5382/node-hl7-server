@@ -1,10 +1,18 @@
+
 # [2.1.0-beta.3](https://github.com/Bugs5382/node-hl7-server/compare/v2.1.0-beta.2...v2.1.0-beta.3) (2024-04-30)
+# [2.1.0](https://github.com/Bugs5382/node-hl7-server/compare/v2.0.0...v2.1.0) (2024-03-02)
 
 
 ### Features
 
 * add getAckMessage ([c2d5442](https://github.com/Bugs5382/node-hl7-server/commit/c2d544212c97c52bd0adf9820343deb2241b70e6)), closes [#61](https://github.com/Bugs5382/node-hl7-server/issues/61)
 * res.getackmessage() is not defined ([#69](https://github.com/Bugs5382/node-hl7-server/issues/69)) ([d37aaff](https://github.com/Bugs5382/node-hl7-server/commit/d37aaff486ed38441b244611f921cec87927fe44))
+* added docker stuff ([f1a4140](https://github.com/Bugs5382/node-hl7-server/commit/f1a4140402be07ba5745e7d386295aade8aec4ff))
+* added docker stuff ([#57](https://github.com/Bugs5382/node-hl7-server/issues/57)) ([1052745](https://github.com/Bugs5382/node-hl7-server/commit/10527455154f587a2a020e71cd5e8e9168b0c4c6))
+* bind to 0.0.0.0 ([9f8c088](https://github.com/Bugs5382/node-hl7-server/commit/9f8c088361c3c6953e2db537e377c90904847a8b))
+* update node-hl7-client ([12876bf](https://github.com/Bugs5382/node-hl7-server/commit/12876bf20e2ec407cabff971a8acc08de40c0140))
+* update packages ([#58](https://github.com/Bugs5382/node-hl7-server/issues/58)) ([824eb6c](https://github.com/Bugs5382/node-hl7-server/commit/824eb6cd8c9ae4aa0df1b0f70f802cae972f38b6))
+* updated packages ([#59](https://github.com/Bugs5382/node-hl7-server/issues/59)) ([34978bc](https://github.com/Bugs5382/node-hl7-server/commit/34978bc2b916e5b0e6cb315d2c49006e9343c087))
 
 # [2.1.0-beta.2](https://github.com/Bugs5382/node-hl7-server/compare/v2.1.0-beta.1...v2.1.0-beta.2) (2024-03-02)
 
