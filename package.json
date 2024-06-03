@@ -84,7 +84,7 @@
     "vitest": "^1.3.1"
   },
   "dependencies": {
-    "node-hl7-client": "^2.1.0"
+    "node-hl7-client": "^2.1.1-beta.1"
   },
   "precommit": [
     "lint:fix",

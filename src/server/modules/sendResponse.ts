@@ -1,6 +1,15 @@
 import EventEmitter from 'events'
 import { Socket } from 'net'
 import { Message, randomString } from 'node-hl7-client'
+import {
+  HL7_2_1,
+  HL7_2_2,
+  HL7_2_3,
+  HL7_2_3_1,
+  HL7_2_4,
+  HL7_2_5,
+  HL7_2_5_1, HL7_2_6, HL7_2_7, HL7_2_7_1, HL7_2_8
+} from 'node-hl7-client/hl7'
 import { PROTOCOL_MLLP_FOOTER, PROTOCOL_MLLP_HEADER } from '../../utils/constants.js'
 
 /**
@@ -14,12 +23,15 @@ export class SendResponse extends EventEmitter {
   private readonly _socket: Socket
   /** @internal */
   private readonly _message: Message
+  /** @internal */
+  private readonly _overrideMSH: boolean
 
-  constructor (socket: Socket, message: Message) {
+  constructor (socket: Socket, message: Message, overrideMSH: boolean) {
     super()
     this._ack = undefined
     this._message = message
     this._socket = socket
+    this._overrideMSH = overrideMSH
   }
 
   /**
@@ -66,10 +78,50 @@ export class SendResponse extends EventEmitter {
 
   /** @internal */
   private _createAckMessage (type: string, message: Message): Message {
+    let specClass
+    const spec = message.get('MSH.12').toString()
+    switch (spec) {
+      case '2.1':
+        specClass = new HL7_2_1()
+        break
+      case '2.2':
+        specClass = new HL7_2_2()
+        break
+      case '2.3':
+        specClass = new HL7_2_3()
+        break
+      case '2.3.1':
+        specClass = new HL7_2_3_1()
+        break
+      case '2.4':
+        specClass = new HL7_2_4()
+        break
+      case '2.5':
+        specClass = new HL7_2_5()
+        break
+      case '2.5.1':
+        specClass = new HL7_2_5_1()
+        break
+      case '2.6':
+        specClass = new HL7_2_6()
+        break
+      case '2.7':
+        specClass = new HL7_2_7()
+        break
+      case '2.7.1':
+        specClass = new HL7_2_7_1()
+        break
+      case '2.8':
+        specClass = new HL7_2_8()
+        break
+    }
+
     const ackMessage = new Message({
+      specification: specClass,
       messageHeader: {
         msh_9_1: 'ACK',
         msh_9_2: message.get('MSH.9.2').toString(),
+        msh_9_3: this._overrideMSH ? 'ACK' : undefined,
         msh_10: 'ACK',
         msh_11_1: message.get('MSH.11.1').toString() as 'P' | 'D' | 'T'
       }
@@ -93,10 +145,11 @@ export class SendResponse extends EventEmitter {
     const ackMessage = new Message({
       messageHeader: {
         msh_9_1: 'ACK',
-        // There is no 9.2 for ACK a failure.
+        // There is not an MSH 9.2 for ACK a failure.
         // There should be.
         // So we are using Z99, which is not assigned yet.
         msh_9_2: 'Z99',
+        msh_9_3: 'ACK',
         msh_10: 'ACK',
         msh_11_1: 'P'
       }

@@ -11,6 +11,7 @@ const DEFAULT_SERVER_OPTS = {
 }
 
 const DEFAULT_LISTENER_OPTS = {
+  overrideMSH: false,
   encoding: 'utf-8'
 }
 
@@ -38,6 +39,12 @@ export interface ServerOptions {
  * @since 1.0.0
  */
 export interface ListenerOptions {
+  /** The HL7 spec we are going to be creating
+   * Set this to true if the spec that you expect to be receiving from the client
+   * can support MSH 9.3 as type 'ACK'.
+   * Otherwise, MSH 9.3 will remain a combined string of ACK and MSH 9.2.
+   * @since 2.3.0 */
+  overrideMSH?: boolean
   /** Name of the Listener (e.g., IB_EPIC_ADT)
    * @default Randomized String */
   name?: string
@@ -64,6 +71,7 @@ type ValidatedKeys =
 interface ValidatedOptions extends Pick<Required<ListenerOptions>, ValidatedKeys> {
   name: string
   port: number
+  overrideMSH: boolean
 }
 
 /** @internal */
