@@ -92,16 +92,32 @@ When you get a message, you can then parse any segment of the message and do you
 
 ```ts
 const IB_ADT = server.createInbound({port: LISTEN_PORT}, async (req, res) => {
-          const messageReq = req.getMessage()
-          const messageRes = res.getAckMessage()
-          const hl7Version = messageReq.get('MSH.12').toString()
-        })
+  const messageReq = req.getMessage()
+  const messageRes = res.getAckMessage()
+  const hl7Version = messageReq.get('MSH.12').toString()
+})
 ```
 
 In this case... ```res.getAckMessage()``` returns a Message object from ```node-hl7-client```.
 Then you can query the segment ```MSH.12``` in this instance and get its result.
 
 Please consult [node-hl7-client](https://www.npmjs.com/package/node-hl7-client) documentation for further ways to parse the message segment.
+
+### Override MSH Header
+
+In HL7 specification 2.1 through 2.3.1, MSH header segment could not be 'ACK'.
+It was a combination of ACK and MSH 9.2 (e.g. ADT_A01) for the full reference of ```ACK^A01^ADT_A01```.
+From 2.4 specification to current,
+a client might be looking for just ```ACK``` instead of ```ADT_A01``` given now the output of ```ACK^A01^ACK```.
+This is not default behavior as the two pair results of ```ADT_A01``` give more information back
+since MSH 9.1 is usually ACK to start with.
+
+To override this please setup your listener with:
+
+```ts
+ const listener = server.createInbound({port: 3000, overrideMSH: true }, async (req, res) => {})
+```
+... and if the specification covers the MSH 9.3 as ACK, it will make it so. Otherwise, it will just be empty.
 
 ## Docker
 
