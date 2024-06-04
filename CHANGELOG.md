@@ -1,3 +1,11 @@
+# [2.3.0-beta.1](https://github.com/Bugs5382/node-hl7-server/compare/v2.2.0...v2.3.0-beta.1) (2024-06-04)
+
+
+### Features
+
+* added MSH override with spec being passed over ([c0754e1](https://github.com/Bugs5382/node-hl7-server/commit/c0754e15742fb6674718c80116a07f4ebe2caaf1))
+* added MSH override with spec being passed over ([#77](https://github.com/Bugs5382/node-hl7-server/issues/77)) ([8ecdb26](https://github.com/Bugs5382/node-hl7-server/commit/8ecdb263da4d615da6fad091ce4db3bbba5d80b5))
+* update packages ([06f6fc9](https://github.com/Bugs5382/node-hl7-server/commit/06f6fc9993c71c295021d5baa8aae10d3f02fb67))
 
 # [2.2.0-beta.2](https://github.com/Bugs5382/node-hl7-server/compare/v2.2.0-beta.1...v2.2.0-beta.2) (2024-06-04)
 
