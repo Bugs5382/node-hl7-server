@@ -58,6 +58,55 @@ describe('node hl7 end to end - client', () => {
 
     })
 
+    test('...simple connect ... MSH 9.3 override', async () => {
+
+      let dfd = createDeferred<void>()
+
+      const server = new Server({bindAddress: '0.0.0.0'})
+      const listener = server.createInbound({port: 3000, overrideMSH: true }, async (req, res) => {
+        const messageReq = req.getMessage()
+        expect(messageReq.get('MSH.12').toString()).toBe('2.7')
+        await res.sendResponse('AA')
+        const messageRes = res.getAckMessage()
+        expect(messageRes?.get('MSA.1').toString()).toBe('AA')
+        expect(messageRes?.get('MSH.9.3').toString()).toBe('ACK')
+      })
+
+      await expectEvent(listener, 'listen')
+
+      const client = new Client({ host: '0.0.0.0' })
+
+      const outbound = client.createConnection({ port: 3000 }, async (res) => {
+        const messageRes = res.getMessage()
+        expect(messageRes.get('MSA.1').toString()).toBe('AA')
+        dfd.resolve()
+      })
+
+      await expectEvent(outbound, 'connect')
+
+      let message = new Message({
+        messageHeader: {
+          msh_9_1: 'ADT',
+          msh_9_2: 'A01',
+          msh_10: 'CONTROL_ID',
+          msh_11_1: 'D'
+        }
+      })
+
+      await outbound.sendMessage(message)
+
+      await dfd.promise
+
+      expect(client.totalSent()).toEqual(1)
+      expect(client.totalAck()).toEqual(1)
+
+      await outbound.close()
+      await listener.close()
+
+      client.closeAll()
+
+    })
+
     test('...send simple message twice, no ACK needed', async () => {
 
       await tcpPortUsed.check(3000, '0.0.0.0')

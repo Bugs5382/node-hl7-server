@@ -181,7 +181,7 @@ export class Inbound extends EventEmitter implements Inbound {
               // create the inbound request
               const req = new InboundRequest(messageParsed, { type: 'file' })
               // create the send response function
-              const res = new SendResponse(socket, message)
+              const res = new SendResponse(socket, message, this._opt.overrideMSH)
               // on a response sent, tell the inbound listener
               res.on('response.sent', () => {
                 this.emit('response.sent')
@@ -202,7 +202,7 @@ export class Inbound extends EventEmitter implements Inbound {
               // create the inbound request
               const req = new InboundRequest(messageParsed, { type: 'file' })
               // create the send response function
-              const res = new SendResponse(socket, message)
+              const res = new SendResponse(socket, message, this._opt.overrideMSH)
               // on a response sent, tell the inbound listener
               void this._handler(req, res)
             })
@@ -214,7 +214,7 @@ export class Inbound extends EventEmitter implements Inbound {
             // create the inbound request
             const req = new InboundRequest(messageParsed, { type: 'file' })
             // create the send response function
-            const res = new SendResponse(socket, messageParsed)
+            const res = new SendResponse(socket, messageParsed, this._opt.overrideMSH)
             // on a response sent, tell the inbound listener
             void this._handler(req, res)
           }
