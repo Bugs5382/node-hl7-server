@@ -298,6 +298,7 @@ describe('node hl7 end to end - client', () => {
         async (req, res) => {
           const messageReq = req.getMessage();
           expect(messageReq.get("MSH.12").toString()).toBe("2.7");
+          expect(messageReq.get("OBX.3.1").toString()).toBe("SOME-PDF");
           await res.sendResponse("AA");
           const messageRes = res.getAckMessage();
           expect(messageRes?.get("MSA.1").toString()).toBe("AA");
