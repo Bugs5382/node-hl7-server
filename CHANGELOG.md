@@ -1,3 +1,12 @@
+# [2.4.0](https://github.com/Bugs5382/node-hl7-server/compare/v2.3.0...v2.4.0) (2024-06-25)
+
+
+### Features
+
+* update ([#83](https://github.com/Bugs5382/node-hl7-server/issues/83)) ([6071fb1](https://github.com/Bugs5382/node-hl7-server/commit/6071fb15556d5d42c86e316bb4b5346fe77633b5))
+* update packages ([422fa6f](https://github.com/Bugs5382/node-hl7-server/commit/422fa6f958fe7d3cab9baa50055deac79a006fe9))
+* update packages ([#82](https://github.com/Bugs5382/node-hl7-server/issues/82)) ([8e9fe1f](https://github.com/Bugs5382/node-hl7-server/commit/8e9fe1f6bcf83868c09bd9690e5557f963c9bc95))
+
 # [2.4.0-beta.1](https://github.com/Bugs5382/node-hl7-server/compare/v2.3.0...v2.4.0-beta.1) (2024-06-25)
 
 
