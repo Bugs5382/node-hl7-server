@@ -134,6 +134,11 @@ and modify ```docker/server.js``` to your liking and then build the docker image
 
 Suggestions? Open a PR!
 
+## Documentation
+
+GitHub pages now has mostly full listing of all methods, classes, etc., but only for the most recent release.
+You can view it [here](https://bugs5382.github.io/node-hl7-server/).
+
 ## Acknowledgements
 
 - Code Design/Auto Re-Connect/Resend, Inspiration: [node-rabbitmq-client](https://github.com/cody-greene/node-rabbitmq-client)

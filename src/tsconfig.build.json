@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.base.json",
+  "include": [
+    "**/*.ts"
+  ],
+  "exclude": [
+    "./vitest.config.ts",
+    "./release.config.{cjs|js}"
+  ]
+}

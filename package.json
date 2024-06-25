@@ -1,6 +1,6 @@
 {
   "name": "node-hl7-server",
-  "version": "2.3.0",
+  "version": "2.4.0-beta.1",
   "description": "Node.js client library for creating a HL7 Server which can accept incoming a properly formatted HL7 message(s), and then parses the HL7 message. Once the message has been parsed you can then do something with the final result that you so desire.",
   "module": "./lib/esm/index.js",
   "main": "./lib/cjs/index.js",
@@ -21,12 +21,12 @@
   },
   "scripts": {
     "clean": "rm -rf coverage docs lib temp",
-    "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && tsc -p tsconfig.types.json && ./bin/build-types.sh",
-    "build:watch": "tsc -p tsconfig.esm.json -w",
+    "build": "tsc -p src/tsconfig.esm.json && tsc -p src/tsconfig.cjs.json && tsc -p src/tsconfig.types.json && ./bin/build-types.sh",
+    "build:watch": "tsc -p src/tsconfig.esm.json -w",
     "docker:build": "docker build -t docker-node-hl7-server:latest .",
     "npm:lint": "npmPkgJsonLint .",
-    "lint": "npm run npm:lint && ts-standard | snazzy",
-    "lint:fix": "npm run npm:lint . && ts-standard --fix | snazzy",
+    "lint": "npm run npm:lint && ts-standard -p src/tsconfig.esm.json | snazzy",
+    "lint:fix": "npm run npm:lint . && ts-standard  -p src/tsconfig.esm.json --fix | snazzy",
     "pack": "npm pack",
     "prepublishOnly": "npm run clean && npm run build && npm run pack",
     "test": "vitest run",
@@ -67,10 +67,10 @@
     "@the-rabbit-hole/semantic-release-config": "^1.5.0",
     "@types/node": "^20.11.16",
     "@types/tcp-port-used": "^1.0.4",
-    "@typescript-eslint/parser": "^7.12.0",
+    "@typescript-eslint/parser": "^7.14.1",
     "@vitest/coverage-v8": "^1.2.2",
     "@vitest/ui": "^1.2.2",
-    "npm-package-json-lint": "^7.1.0",
+    "npm-package-json-lint": "^8.0.0",
     "portfinder": "^1.0.32",
     "pre-commit": "^1.2.2",
     "semantic-release": "^24.0.0",
@@ -78,13 +78,13 @@
     "tcp-port-used": "^1.0.2",
     "ts-node": "^10.9.2",
     "ts-standard": "^12.0.2",
-    "tsd": "^0.31.0",
-    "typedoc": "^0.25.13",
-    "typescript": "5.4.5",
+    "tsd": "^0.31.1",
+    "typedoc": "^0.26.2",
+    "typescript": "5.5.2",
     "vitest": "^1.6.0"
   },
   "dependencies": {
-    "node-hl7-client": "^2.2.0"
+    "node-hl7-client": "^2.3.0"
   },
   "precommit": [
     "lint:fix",
