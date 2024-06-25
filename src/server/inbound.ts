@@ -14,7 +14,7 @@ import { Server } from './server.js'
  * @since 1.0.0
  * @example
  * In this example, we are processing the results in an async handler.
- *````
+ *```ts
  *  const IB_ADT = server.createInbound({port: 3000}, async (req, res) => {
  *    const messageReq = req.getMessage()
  *    const messageRes = res.getAckMessage()
