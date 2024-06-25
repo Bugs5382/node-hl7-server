@@ -155,7 +155,7 @@ export class Inbound extends EventEmitter implements Inbound {
 
       try {
         // set message
-        loadedMessage = buffer.toString().replace(PROTOCOL_MLLP_HEADER, '')
+        loadedMessage += buffer.toString().replace(PROTOCOL_MLLP_HEADER, '')
 
         // is there is F5 and CR in this message?
         if (loadedMessage.includes(PROTOCOL_MLLP_FOOTER)) {
