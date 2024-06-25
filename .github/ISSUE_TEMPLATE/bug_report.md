@@ -10,22 +10,18 @@ labels: bug
 
 ## Environment
 
--   HL7 Client version:
+-   HL7 Server version:
 -   TypeScript version:
 -   Node.js version:
 -   OS:
 
-Questions:
-
-- Are you using the Node [HL7 Server](https://github.com/Bugs5382/node-hl7-server) package as your HL7 Server to connect to or a 3rd party system?
-
 ## Expected Behavior
 
-<!-- How did you expect HL7 Client to work? -->
+<!-- How did you expect HL7 Server to work? -->
 
 ## Actual Behavior
 
-<!-- What does HL7 Client fail to do? -->
+<!-- What does HL7 Server fail to do? -->
 
 ## Steps to reproduce the bug
 
