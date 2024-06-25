@@ -30,3 +30,17 @@ export const createDeferred = <T=any>(noUncaught?: boolean): Deferred<T> => {
   }
   return dfd
 }
+
+/** @internal */
+export const generateLargeBase64String = (sizeInKb: number = 200) => {
+  // Size in bytes (200KB = 200 * 1024 bytes)
+  const size = sizeInKb * 1024;
+
+  // Generate string of 'a' characters
+  let largeString = "";
+  for (let i = 0; i < size; i++) {
+    largeString += "a";
+  }
+
+  return Buffer.from(largeString).toString("base64");
+};
