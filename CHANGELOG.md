@@ -1,3 +1,13 @@
+## [2.4.1-beta.1](https://github.com/Bugs5382/node-hl7-server/compare/v2.4.0...v2.4.1-beta.1) (2024-06-25)
+
+
+### Bug Fixes
+
+* **60:** Added test to replicate the issue ([f745ceb](https://github.com/Bugs5382/node-hl7-server/commit/f745cebe8e93c2ebb4a14211abf9cb6be4dcdc5e))
+* **60:** Ensure large messages like encapsulated PDFs are not split and ignored by the server ([#86](https://github.com/Bugs5382/node-hl7-server/issues/86)) ([c92a612](https://github.com/Bugs5382/node-hl7-server/commit/c92a612a215223f752fe097926d55291194ad753))
+* Added additional assertion ([6b596eb](https://github.com/Bugs5382/node-hl7-server/commit/6b596ebb517516cc989a3540f0f2b308d2019bee))
+* Added fix to ensure message body is concatenated ([9d927ab](https://github.com/Bugs5382/node-hl7-server/commit/9d927ab272757e5fb24655e357afaeff3f7f0c17))
+
 # [2.4.0](https://github.com/Bugs5382/node-hl7-server/compare/v2.3.0...v2.4.0) (2024-06-25)
 
 
