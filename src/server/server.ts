@@ -4,10 +4,9 @@ import { ServerOptions, normalizeServerOptions, ListenerOptions } from '../utils
 
 /**
  * Server Class
- * @description Start Server listening on a network address.
+ * @remarks Start Server listening on a network address.
  * {@link ServerOptions} Link to the options that can be passed into props.
  * @since 1.0.0
- * @extends EventEmitter
  */
 export class Server extends EventEmitter {
   /** @internal */
@@ -43,7 +42,7 @@ export class Server extends EventEmitter {
   }
 
   /** This creates an instance of a HL7 server.
-   * @description You would specify your port and what it will do when it gets a message.
+   * @remarks You would specify your port and what it will do when it gets a message.
    * @since 1.0.0
    * @example
    *```
