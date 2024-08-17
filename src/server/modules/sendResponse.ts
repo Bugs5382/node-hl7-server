@@ -52,7 +52,7 @@ export class SendResponse extends EventEmitter {
    *  await res.sendResponse("AA")
    * })
    *
-   * ot
+   * or
    *
    * const server = new Server({bindAddress: '0.0.0.0'})
    * const IB_ADT = server.createInbound({port: LISTEN_PORT}, async (req, res) => {
