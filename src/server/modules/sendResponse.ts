@@ -43,17 +43,36 @@ export class SendResponse extends EventEmitter {
    * If you are to confirm to the end user (client) that the message they sent was good and processed successfully.
    * you would send an "AA" style message (Application Accept).
    * Otherwise, send an "AR" (Application Reject) to tell the client the data was
-   * no accept.ed/processed.
-   * ```
+   * not accepted/processed or send an "AE"
+   * (Application Error) to tell the client your overall application had an error.
+   * ```ts
    * const server = new Server({bindAddress: '0.0.0.0'})
    * const IB_ADT = server.createInbound({port: LISTEN_PORT}, async (req, res) => {
    *  const messageReq = req.getMessage()
    *  await res.sendResponse("AA")
    * })
-   * ```
-   * "AE" (Application Error) will be sent if there is a problem creating either an "AA" or "AR" message from the orginial message sent.
+   *
+   * or
+   *
+   * const server = new Server({bindAddress: '0.0.0.0'})
+   * const IB_ADT = server.createInbound({port: LISTEN_PORT}, async (req, res) => {
+   *  const messageReq = req.getMessage()
+   *  await res.sendResponse("AR")
+   * })
+   *
+   * or
+   *
+   * const server = new Server({bindAddress: '0.0.0.0'})
+   * const IB_ADT = server.createInbound({port: LISTEN_PORT}, async (req, res) => {
+   *  const messageReq = req.getMessage()
+   *  await res.sendResponse("AE")
+   * })
+   *```
+   *
+   * "AE" (Application Error) will be automatically sent if there is a problem creating either an "AA" or "AR"
+   * message from the original message sent because the original message structure sent wrong in the first place.
    */
-  async sendResponse (type: 'AA' | 'AR'): Promise<void> {
+  async sendResponse (type: 'AA' | 'AR' | 'AE'): Promise<void> {
     try {
       this._ack = this._createAckMessage(type, this._message)
       this._socket.write(Buffer.from(`${PROTOCOL_MLLP_HEADER}${this._ack.toString()}${PROTOCOL_MLLP_FOOTER}`))
@@ -69,7 +88,7 @@ export class SendResponse extends EventEmitter {
   /**
    * Get the Ack Message
    * @since 2.2.0
-   * @description Get the acknowledged message that was sent to the client.
+   * @remarks Get the acknowledged message that was sent to the client.
    * This could return undefined if accessed prior to sending the response
    */
   getAckMessage (): Message | undefined {
