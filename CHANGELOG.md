@@ -1,3 +1,11 @@
+# [2.5.0-beta.1](https://github.com/Bugs5382/node-hl7-server/compare/v2.4.1...v2.5.0-beta.1) (2024-08-20)
+
+
+### Features
+
+* **#100:** added AE support ([20f33c3](https://github.com/Bugs5382/node-hl7-server/commit/20f33c37943677bb2d21a386fbdf3fec63fe1d86)), closes [#100](https://github.com/Bugs5382/node-hl7-server/issues/100)
+* **#100:** support ae type in send response ([#101](https://github.com/Bugs5382/node-hl7-server/issues/101)) ([5e09595](https://github.com/Bugs5382/node-hl7-server/commit/5e095952b4a4894c46b28e27734d2b2509b91af2)), closes [#100](https://github.com/Bugs5382/node-hl7-server/issues/100)
+
 ## [2.4.1](https://github.com/Bugs5382/node-hl7-server/compare/v2.4.0...v2.4.1) (2024-06-25)
 
 
