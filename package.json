@@ -1,6 +1,6 @@
 {
   "name": "node-hl7-server",
-  "version": "2.4.1",
+  "version": "2.5.0-beta.1",
   "description": "Node.js client library for creating a HL7 Server which can accept incoming a properly formatted HL7 message(s), and then parses the HL7 message. Once the message has been parsed you can then do something with the final result that you so desire.",
   "module": "./lib/esm/index.js",
   "main": "./lib/cjs/index.js",
@@ -17,7 +17,7 @@
     "lib/"
   ],
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=20.8.1"
   },
   "scripts": {
     "clean": "rm -rf coverage docs lib temp",
@@ -63,13 +63,13 @@
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/commit-analyzer": "^13.0.0",
     "@semantic-release/git": "^10.0.1",
-    "@semantic-release/release-notes-generator": "^14.0.0",
+    "@semantic-release/release-notes-generator": "^14.0.1",
     "@the-rabbit-hole/semantic-release-config": "^1.5.0",
-    "@types/node": "^20.11.16",
+    "@types/node": "^22.4.0",
     "@types/tcp-port-used": "^1.0.4",
-    "@typescript-eslint/parser": "^7.14.1",
-    "@vitest/coverage-v8": "^1.2.2",
-    "@vitest/ui": "^1.2.2",
+    "@typescript-eslint/parser": "^8.1.0",
+    "@vitest/coverage-v8": "^2.0.5",
+    "@vitest/ui": "^2.0.5",
     "npm-package-json-lint": "^8.0.0",
     "portfinder": "^1.0.32",
     "pre-commit": "^1.2.2",
@@ -79,9 +79,9 @@
     "ts-node": "^10.9.2",
     "ts-standard": "^12.0.2",
     "tsd": "^0.31.1",
-    "typedoc": "^0.26.2",
-    "typescript": "5.5.2",
-    "vitest": "^1.6.0"
+    "typedoc": "^0.26.5",
+    "typescript": "5.5.4",
+    "vitest": "^2.0.5"
   },
   "dependencies": {
     "node-hl7-client": "^2.3.1"

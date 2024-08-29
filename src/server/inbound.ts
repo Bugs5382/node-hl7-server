@@ -10,7 +10,7 @@ import { Server } from './server.js'
 
 /**
  * Inbound Handler
- * @description The handler that will handle the user parsing a received message by the client to the server.
+ * @remarks The handler that will handle the user parsing a received message by the client to the server.
  * @since 1.0.0
  * @example
  * In this example, we are processing the results in an async handler.
@@ -47,7 +47,6 @@ export interface Inbound extends EventEmitter {
 /**
  * Inbound Listener Class
  * @since 1.0.0
- * @extends EventEmitter
  */
 export class Inbound extends EventEmitter implements Inbound {
   /** @internal */
@@ -202,7 +201,7 @@ export class Inbound extends EventEmitter implements Inbound {
               // create the inbound request
               const req = new InboundRequest(messageParsed, { type: 'file' })
               // create the send response function
-              const res = new SendResponse(socket, message, this._opt.overrideMSH)
+              const res = new SendResponse(socket, messageParsed, this._opt.overrideMSH)
               // on a response sent, tell the inbound listener
               void this._handler(req, res)
             })
