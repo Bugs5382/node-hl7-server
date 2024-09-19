@@ -154,18 +154,20 @@ describe('node hl7 end to end - client', () => {
 
     })
 
-    test('...simple connect ... MSH 9.3 override', async () => {
+    test('...simple connect ... MSH overrides', async () => {
 
       let dfd = createDeferred<void>()
 
       const server = new Server({bindAddress: '0.0.0.0'})
-      const listener = server.createInbound({port: 3000, overrideMSH: true }, async (req, res) => {
+      // override MSH field 9.3 to "ACK" and field 18 to "UNICODE UTF-8"
+      const listener = server.createInbound({port: 3000, mshOverrides: { '9.3': 'ACK', '18': 'UNICODE UTF-8' } }, async (req, res) => {
         const messageReq = req.getMessage()
         expect(messageReq.get('MSH.12').toString()).toBe('2.7')
         await res.sendResponse('AA')
         const messageRes = res.getAckMessage()
         expect(messageRes?.get('MSA.1').toString()).toBe('AA')
         expect(messageRes?.get('MSH.9.3').toString()).toBe('ACK')
+        expect(messageRes?.get('MSH.18').toString()).toBe('UNICODE UTF-8')
       })
 
       await expectEvent(listener, 'listen')
@@ -334,15 +336,15 @@ describe('node hl7 end to end - client', () => {
         let dfd = createDeferred<void>()
 
         const server = new Server(
-          {
-            bindAddress: '0.0.0.0',
-            tls:
-              {
-                key: fs.readFileSync(path.join('certs/', 'server-key.pem')),
-                cert: fs.readFileSync(path.join('certs/', 'server-crt.pem')),
-                rejectUnauthorized: false
-              }
-          })
+            {
+              bindAddress: '0.0.0.0',
+              tls:
+                  {
+                    key: fs.readFileSync(path.join('certs/', 'server-key.pem')),
+                    cert: fs.readFileSync(path.join('certs/', 'server-crt.pem')),
+                    rejectUnauthorized: false
+                  }
+            })
         const inbound = server.createInbound({ port: 3000 }, async (req, res) => {
           const messageReq = req.getMessage()
           expect(messageReq.get('MSH.12').toString()).toBe('2.7')
@@ -393,15 +395,15 @@ describe('node hl7 end to end - client', () => {
 
       const server = new Server({ bindAddress: "0.0.0.0" });
       const listener = server.createInbound(
-        { port: 3000 },
-        async (req, res) => {
-          const messageReq = req.getMessage();
-          expect(messageReq.get("MSH.12").toString()).toBe("2.7");
-          expect(messageReq.get("OBX.3.1").toString()).toBe("SOME-PDF");
-          await res.sendResponse("AA");
-          const messageRes = res.getAckMessage();
-          expect(messageRes?.get("MSA.1").toString()).toBe("AA");
-        }
+          { port: 3000 },
+          async (req, res) => {
+            const messageReq = req.getMessage();
+            expect(messageReq.get("MSH.12").toString()).toBe("2.7");
+            expect(messageReq.get("OBX.3.1").toString()).toBe("SOME-PDF");
+            await res.sendResponse("AA");
+            const messageRes = res.getAckMessage();
+            expect(messageRes?.get("MSA.1").toString()).toBe("AA");
+          }
       );
 
       await expectEvent(listener, "listen");
