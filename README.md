@@ -53,9 +53,9 @@ import { Server } from 'node-hl7-server'
 const server = new Server()
 
 const IB = server.createInbound({port: 3000}, async (req, res) => {
-  const messageReq = req.getMessage()
-  const messageRes = res.getAckMessage()
-  // do your code here
+    const messageReq = req.getMessage()
+    const messageRes = res.getAckMessage()
+    // do your code here
 })
 ```
 
@@ -78,23 +78,23 @@ TLS:
 import { Server } from 'node-hl7-server'
 
 const server = new Server(
-  {
-    tls:
-      {
-        key: fs.readFileSync(path.join('certs/', 'server-key.pem')), // where your certs are
-        cert: fs.readFileSync(path.join('certs/', 'server-crt.pem')), // where your certs are
-        rejectUnauthorized: false
-      }
-  })
+    {
+        tls:
+            {
+                key: fs.readFileSync(path.join('certs/', 'server-key.pem')), // where your certs are
+                cert: fs.readFileSync(path.join('certs/', 'server-crt.pem')), // where your certs are
+                rejectUnauthorized: false
+            }
+    })
 ```
 
 When you get a message, you can then parse any segment of the message and do you need to in order for your app to work.
 
 ```ts
 const IB_ADT = server.createInbound({port: LISTEN_PORT}, async (req, res) => {
-  const messageReq = req.getMessage()
-  const messageRes = res.getAckMessage()
-  const hl7Version = messageReq.get('MSH.12').toString()
+    const messageReq = req.getMessage()
+    const messageRes = res.getAckMessage()
+    const hl7Version = messageReq.get('MSH.12').toString()
 })
 ```
 
@@ -103,21 +103,15 @@ Then you can query the segment ```MSH.12``` in this instance and get its result.
 
 Please consult [node-hl7-client](https://www.npmjs.com/package/node-hl7-client) documentation for further ways to parse the message segment.
 
-### Override MSH Header
+### Override response MSH fields
 
-In HL7 specification 2.1 through 2.3.1, MSH header segment could not be 'ACK'.
-It was a combination of ACK and MSH 9.2 (e.g. ADT_A01) for the full reference of ```ACK^A01^ADT_A01```.
-From 2.4 specification to current,
-a client might be looking for just ```ACK``` instead of ```ADT_A01``` given now the output of ```ACK^A01^ACK```.
-This is not default behavior as the two pair results of ```ADT_A01``` give more information back
-since MSH 9.1 is usually ACK to start with.
+Individual response MSH segment fields can be overridden by passing the optional `mshOverrides` prop to `server.createInbound`.
 
-To override this please setup your listener with:
+For example, the following overrides the default MSH field 9.3 value to "ACK":
 
 ```ts
- const listener = server.createInbound({port: 3000, overrideMSH: true }, async (req, res) => {})
+ const listener = server.createInbound({ port: 3000, mshOverrides: { '9.3': 'ACK' }}, async (req, res) => {})
 ```
-... and if the specification covers the MSH 9.3 as ACK, it will make it so. Otherwise, it will just be empty.
 
 ## Docker
 
@@ -127,7 +121,7 @@ npm run docker:build
 
 This package, if you download from source,
 comes with a DockerFile to build a simple docker image with a basic node-hl7-server running.
-All the server does is respond "success" to all properly formatted HL7 messages. 
+All the server does is respond "success" to all properly formatted HL7 messages.
 
 If you want more a custom instance of this server, download the GIT,
 and modify ```docker/server.js``` to your liking and then build the docker image and run it.
