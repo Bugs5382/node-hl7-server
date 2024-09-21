@@ -11,7 +11,7 @@ import {
   HL7_2_5_1, HL7_2_6, HL7_2_7, HL7_2_7_1, HL7_2_8
 } from 'node-hl7-client/hl7'
 import { PROTOCOL_MLLP_FOOTER, PROTOCOL_MLLP_HEADER } from '../../utils/constants.js'
-import type { ListenerOptions } from '../../utils/normalize'
+import type { ListenerOptions } from '../../utils/normalize.js'
 
 /**
  * Send Response
