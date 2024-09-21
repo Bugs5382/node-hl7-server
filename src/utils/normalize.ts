@@ -39,8 +39,8 @@ export interface ServerOptions {
  */
 export interface ListenerOptions {
   /** Optional MSH segment overrides
-   * syntax: [field path as numbers separated by dots]: [field value]
-   * e.g. { '9.3': 'ACK' } --> MSH field 9.3 set to "ACK"
+   * syntax: "field path as numbers separated by dots": "field value"
+   * e.g. { '9.3': 'ACK' } → MSH field 9.3 set to "ACK"
    * @since 2.5.0 */
   mshOverrides?: Record<string, string>
   /** Name of the Listener (e.g., IB_EPIC_ADT)
