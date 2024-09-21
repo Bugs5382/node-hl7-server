@@ -1,3 +1,20 @@
+# [3.0.0-beta.1](https://github.com/Bugs5382/node-hl7-server/compare/v2.5.0-beta.1...v3.0.0-beta.1) (2024-09-21)
+
+
+* 103 feat allow overriding response msh content ([#107](https://github.com/Bugs5382/node-hl7-server/issues/107)) ([ba7ec92](https://github.com/Bugs5382/node-hl7-server/commit/ba7ec92f9626146464e1071230c37fc6a2fa1026))
+
+
+### Features
+
+* Allow overriding response MSH content [#103](https://github.com/Bugs5382/node-hl7-server/issues/103) ([b208429](https://github.com/Bugs5382/node-hl7-server/commit/b2084293a0f94dbd26ee75bc4eb78b3c6a2c8c00))
+* Allow overriding response MSH content [#103](https://github.com/Bugs5382/node-hl7-server/issues/103) ([#106](https://github.com/Bugs5382/node-hl7-server/issues/106)) ([1dcef70](https://github.com/Bugs5382/node-hl7-server/commit/1dcef70849ba17feec1209134cd4b16dc4c1c232))
+
+
+### BREAKING CHANGES
+
+* MSH Override Changes
+* MSH Override Changes
+
 # [2.5.0-beta.1](https://github.com/Bugs5382/node-hl7-server/compare/v2.4.1...v2.5.0-beta.1) (2024-08-20)
 
 
