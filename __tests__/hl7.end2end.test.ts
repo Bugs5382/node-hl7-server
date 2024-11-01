@@ -6,6 +6,8 @@ import Client, {Batch, Message} from "node-hl7-client";
 import {createDeferred, expectEvent, generateLargeBase64String} from './__utils__'
 import Server from "../src";
 
+const port = Number(process.env.TEST_PORT) || 3000;
+
 describe('node hl7 end to end - client', () => {
 
   describe('server/client sanity checks', () => {
@@ -15,7 +17,7 @@ describe('node hl7 end to end - client', () => {
       let dfd = createDeferred<void>()
 
       const server = new Server({bindAddress: '0.0.0.0'})
-      const listener = server.createInbound({port: 3000}, async (req, res) => {
+      const listener = server.createInbound({port}, async (req, res) => {
         const messageReq = req.getMessage()
         expect(messageReq.get('MSH.12').toString()).toBe('2.7')
         await res.sendResponse('AA')
@@ -27,7 +29,7 @@ describe('node hl7 end to end - client', () => {
 
       const client = new Client({ host: '0.0.0.0' })
 
-      const outbound = client.createConnection({ port: 3000 }, async (res) => {
+      const outbound = client.createConnection({ port }, async (res) => {
         const messageRes = res.getMessage()
         expect(messageRes.get('MSA.1').toString()).toBe('AA')
         dfd.resolve()
@@ -63,7 +65,7 @@ describe('node hl7 end to end - client', () => {
       let dfd = createDeferred<void>()
 
       const server = new Server({bindAddress: '0.0.0.0'})
-      const listener = server.createInbound({port: 3000}, async (req, res) => {
+      const listener = server.createInbound({port}, async (req, res) => {
         const messageReq = req.getMessage()
         expect(messageReq.get('MSH.12').toString()).toBe('2.7')
         await res.sendResponse('AR')
@@ -75,7 +77,7 @@ describe('node hl7 end to end - client', () => {
 
       const client = new Client({ host: '0.0.0.0' })
 
-      const outbound = client.createConnection({ port: 3000 }, async (res) => {
+      const outbound = client.createConnection({ port }, async (res) => {
         const messageRes = res.getMessage()
         expect(messageRes.get('MSA.1').toString()).toBe('AR')
         dfd.resolve()
@@ -111,7 +113,7 @@ describe('node hl7 end to end - client', () => {
       let dfd = createDeferred<void>()
 
       const server = new Server({bindAddress: '0.0.0.0'})
-      const listener = server.createInbound({port: 3000}, async (req, res) => {
+      const listener = server.createInbound({port}, async (req, res) => {
         const messageReq = req.getMessage()
         expect(messageReq.get('MSH.12').toString()).toBe('2.7')
         await res.sendResponse('AE')
@@ -123,7 +125,7 @@ describe('node hl7 end to end - client', () => {
 
       const client = new Client({ host: '0.0.0.0' })
 
-      const outbound = client.createConnection({ port: 3000 }, async (res) => {
+      const outbound = client.createConnection({ port }, async (res) => {
         const messageRes = res.getMessage()
         expect(messageRes.get('MSA.1').toString()).toBe('AE')
         dfd.resolve()
@@ -154,25 +156,27 @@ describe('node hl7 end to end - client', () => {
 
     })
 
-    test('...simple connect ... MSH 9.3 override', async () => {
+    test('...simple connect ... MSH overrides', async () => {
 
       let dfd = createDeferred<void>()
 
       const server = new Server({bindAddress: '0.0.0.0'})
-      const listener = server.createInbound({port: 3000, overrideMSH: true }, async (req, res) => {
+      // override MSH field 9.3 to "ACK" and field 18 to "UNICODE UTF-8"
+      const listener = server.createInbound({port, mshOverrides: { '9.3': 'ACK', '18': 'UNICODE UTF-8' } }, async (req, res) => {
         const messageReq = req.getMessage()
         expect(messageReq.get('MSH.12').toString()).toBe('2.7')
         await res.sendResponse('AA')
         const messageRes = res.getAckMessage()
         expect(messageRes?.get('MSA.1').toString()).toBe('AA')
         expect(messageRes?.get('MSH.9.3').toString()).toBe('ACK')
+        expect(messageRes?.get('MSH.18').toString()).toBe('UNICODE UTF-8')
       })
 
       await expectEvent(listener, 'listen')
 
       const client = new Client({ host: '0.0.0.0' })
 
-      const outbound = client.createConnection({ port: 3000 }, async (res) => {
+      const outbound = client.createConnection({ port }, async (res) => {
         const messageRes = res.getMessage()
         expect(messageRes.get('MSA.1').toString()).toBe('AA')
         dfd.resolve()
@@ -210,7 +214,7 @@ describe('node hl7 end to end - client', () => {
       let dfd = createDeferred<void>()
 
       const server = new Server({bindAddress: '0.0.0.0'})
-      const listener = server.createInbound({port: 3000}, async (req, res) => {
+      const listener = server.createInbound({port}, async (req, res) => {
         const messageReq = req.getMessage()
         expect(messageReq.get('MSH.12').toString()).toBe('2.7')
         await res.sendResponse('AA')
@@ -221,7 +225,7 @@ describe('node hl7 end to end - client', () => {
       await expectEvent(listener, 'listen')
 
       const client = new Client({ host: '0.0.0.0' })
-      const outbound = client.createConnection({ port: 3000, waitAck: false }, async () => {
+      const outbound = client.createConnection({ port, waitAck: false }, async () => {
         dfd.resolve()
       })
 
@@ -274,7 +278,7 @@ describe('node hl7 end to end - client', () => {
         let dfd = createDeferred<void>()
 
         const server = new Server({ bindAddress: '0.0.0.0' })
-        const inbound = server.createInbound({ port: 3000 }, async (req, res) => {
+        const inbound = server.createInbound({ port }, async (req, res) => {
           const messageReq = req.getMessage()
           expect(messageReq.get('MSH.12').toString()).toBe('2.7')
           await res.sendResponse('AA')
@@ -285,7 +289,7 @@ describe('node hl7 end to end - client', () => {
         await expectEvent(inbound, 'listen')
 
         const client = new Client({ host: '0.0.0.0' })
-        const outbound = client.createConnection({ port: 3000 }, async (res) => {
+        const outbound = client.createConnection({ port }, async (res) => {
           const messageRes = res.getMessage()
           expect(messageRes.get('MSA.1').toString()).toBe('AA')
           dfd.resolve()
@@ -334,16 +338,16 @@ describe('node hl7 end to end - client', () => {
         let dfd = createDeferred<void>()
 
         const server = new Server(
-          {
-            bindAddress: '0.0.0.0',
-            tls:
-              {
-                key: fs.readFileSync(path.join('certs/', 'server-key.pem')),
-                cert: fs.readFileSync(path.join('certs/', 'server-crt.pem')),
-                rejectUnauthorized: false
-              }
-          })
-        const inbound = server.createInbound({ port: 3000 }, async (req, res) => {
+            {
+              bindAddress: '0.0.0.0',
+              tls:
+                  {
+                    key: fs.readFileSync(path.join('certs/', 'server-key.pem')),
+                    cert: fs.readFileSync(path.join('certs/', 'server-crt.pem')),
+                    rejectUnauthorized: false
+                  }
+            })
+        const inbound = server.createInbound({ port }, async (req, res) => {
           const messageReq = req.getMessage()
           expect(messageReq.get('MSH.12').toString()).toBe('2.7')
           await res.sendResponse('AA')
@@ -354,7 +358,7 @@ describe('node hl7 end to end - client', () => {
         await expectEvent(inbound, 'listen')
 
         const client = new Client({ host: '0.0.0.0', tls: { rejectUnauthorized: false } })
-        const outbound = client.createConnection({ port: 3000 }, async (res) => {
+        const outbound = client.createConnection({ port }, async (res) => {
           const messageRes = res.getMessage()
           expect(messageRes.get('MSA.1').toString()).toBe('AA')
           dfd.resolve()
@@ -393,22 +397,22 @@ describe('node hl7 end to end - client', () => {
 
       const server = new Server({ bindAddress: "0.0.0.0" });
       const listener = server.createInbound(
-        { port: 3000 },
-        async (req, res) => {
-          const messageReq = req.getMessage();
-          expect(messageReq.get("MSH.12").toString()).toBe("2.7");
-          expect(messageReq.get("OBX.3.1").toString()).toBe("SOME-PDF");
-          await res.sendResponse("AA");
-          const messageRes = res.getAckMessage();
-          expect(messageRes?.get("MSA.1").toString()).toBe("AA");
-        }
+          { port },
+          async (req, res) => {
+            const messageReq = req.getMessage();
+            expect(messageReq.get("MSH.12").toString()).toBe("2.7");
+            expect(messageReq.get("OBX.3.1").toString()).toBe("SOME-PDF");
+            await res.sendResponse("AA");
+            const messageRes = res.getAckMessage();
+            expect(messageRes?.get("MSA.1").toString()).toBe("AA");
+          }
       );
 
       await expectEvent(listener, "listen");
 
       const client = new Client({ host: "0.0.0.0" });
 
-      const outbound = client.createConnection({ port: 3000 }, async (res) => {
+      const outbound = client.createConnection({ port }, async (res) => {
         const messageRes = res.getMessage();
         expect(messageRes.get("MSA.1").toString()).toBe("AA");
         dfd.resolve();

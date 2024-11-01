@@ -161,15 +161,19 @@ export class Inbound extends EventEmitter implements Inbound {
           // strip them out
           loadedMessage = loadedMessage.replace(PROTOCOL_MLLP_FOOTER, '')
 
+          // copy completed message to continue processing and clear the buffer
+          const completedMessageCopy = JSON.parse(JSON.stringify(loadedMessage))
+          loadedMessage = ''
+
           // parser either is batch or a message
           let parser: FileBatch | Batch | Message
 
           // send raw information to the emit
-          this.emit('data.raw', loadedMessage)
+          this.emit('data.raw', completedMessageCopy)
 
-          if (isFile(loadedMessage)) {
+          if (isFile(completedMessageCopy)) {
             // parser the batch
-            parser = new FileBatch({ text: loadedMessage })
+            parser = new FileBatch({ text: completedMessageCopy })
             // load the messages
             const allMessage = parser.messages()
             allMessage.forEach((message: Message) => {
@@ -180,16 +184,16 @@ export class Inbound extends EventEmitter implements Inbound {
               // create the inbound request
               const req = new InboundRequest(messageParsed, { type: 'file' })
               // create the send response function
-              const res = new SendResponse(socket, message, this._opt.overrideMSH)
+              const res = new SendResponse(socket, message, this._opt.mshOverrides)
               // on a response sent, tell the inbound listener
               res.on('response.sent', () => {
                 this.emit('response.sent')
               })
               void this._handler(req, res)
             })
-          } else if (isBatch(loadedMessage)) {
+          } else if (isBatch(completedMessageCopy)) {
             // parser the batch
-            parser = new Batch({ text: loadedMessage })
+            parser = new Batch({ text: completedMessageCopy })
             // load the messages
             const allMessage = parser.messages()
             // loop messages
@@ -201,19 +205,19 @@ export class Inbound extends EventEmitter implements Inbound {
               // create the inbound request
               const req = new InboundRequest(messageParsed, { type: 'file' })
               // create the send response function
-              const res = new SendResponse(socket, messageParsed, this._opt.overrideMSH)
+              const res = new SendResponse(socket, messageParsed, this._opt.mshOverrides)
               // on a response sent, tell the inbound listener
               void this._handler(req, res)
             })
           } else {
             // parse this message
-            const messageParsed = new Message({ text: loadedMessage })
+            const messageParsed = new Message({ text: completedMessageCopy })
             // increase the total message
             ++this.stats.totalMessage
             // create the inbound request
             const req = new InboundRequest(messageParsed, { type: 'file' })
             // create the send response function
-            const res = new SendResponse(socket, messageParsed, this._opt.overrideMSH)
+            const res = new SendResponse(socket, messageParsed, this._opt.mshOverrides)
             // on a response sent, tell the inbound listener
             void this._handler(req, res)
           }

@@ -11,6 +11,7 @@ import {
   HL7_2_5_1, HL7_2_6, HL7_2_7, HL7_2_7_1, HL7_2_8
 } from 'node-hl7-client/hl7'
 import { PROTOCOL_MLLP_FOOTER, PROTOCOL_MLLP_HEADER } from '../../utils/constants.js'
+import type { ListenerOptions } from '../../utils/normalize.js'
 
 /**
  * Send Response
@@ -24,14 +25,14 @@ export class SendResponse extends EventEmitter {
   /** @internal */
   private readonly _message: Message
   /** @internal */
-  private readonly _overrideMSH: boolean
+  private readonly _mshOverrides: ListenerOptions['mshOverrides']
 
-  constructor (socket: Socket, message: Message, overrideMSH: boolean) {
+  constructor (socket: Socket, message: Message, mshOverrides?: ListenerOptions['mshOverrides']) {
     super()
     this._ack = undefined
     this._message = message
+    this._mshOverrides = mshOverrides
     this._socket = socket
-    this._overrideMSH = overrideMSH
   }
 
   /**
@@ -140,7 +141,6 @@ export class SendResponse extends EventEmitter {
       messageHeader: {
         msh_9_1: 'ACK',
         msh_9_2: message.get('MSH.9.2').toString(),
-        msh_9_3: this._overrideMSH ? 'ACK' : undefined,
         msh_10: 'ACK',
         msh_11_1: message.get('MSH.11.1').toString() as 'P' | 'D' | 'T'
       }
@@ -151,6 +151,12 @@ export class SendResponse extends EventEmitter {
     ackMessage.set('MSH.5', message.get('MSH.3').toString())
     ackMessage.set('MSH.6', message.get('MSH.4').toString())
     ackMessage.set('MSH.12', message.get('MSH.12').toString())
+
+    if (typeof this._mshOverrides === 'object') {
+      Object.entries(this._mshOverrides).forEach(([path, value]) => {
+        ackMessage.set(`MSH.${path}`, value)
+      })
+    }
 
     const segment = ackMessage.addSegment('MSA')
     segment.set('1', type)
