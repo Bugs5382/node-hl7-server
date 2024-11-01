@@ -2,11 +2,11 @@ import EventEmitter from 'events'
 import net, { Socket } from 'net'
 import tls from 'tls'
 import { FileBatch, Batch, Message, isBatch, isFile } from 'node-hl7-client'
-import { PROTOCOL_MLLP_FOOTER, PROTOCOL_MLLP_HEADER } from '../utils/constants.js'
 import { ListenerOptions, normalizeListenerOptions } from '../utils/normalize.js'
 import { InboundRequest } from './modules/inboundRequest.js'
 import { SendResponse } from './modules/sendResponse.js'
 import { Server } from './server.js'
+import { MLLPCodec } from '../utils/codec.js'
 
 /**
  * Inbound Handler
@@ -69,6 +69,9 @@ export class Inbound extends EventEmitter implements Inbound {
     totalMessage: 0
   }
 
+  private _dataResult: boolean | undefined
+  private _codec: MLLPCodec | null
+
   /**
    * Build a Listener
    * @since 1.0.0
@@ -88,6 +91,8 @@ export class Inbound extends EventEmitter implements Inbound {
 
     this._listen = this._listen.bind(this)
     this._onTcpClientConnected = this._onTcpClientConnected.bind(this)
+
+    this._codec = null
 
     this._socket = this._listen()
   }
@@ -116,9 +121,15 @@ export class Inbound extends EventEmitter implements Inbound {
 
     if (typeof this._main._opt.tls !== 'undefined') {
       const { key, cert, requestCert, ca } = this._main._opt.tls
-      socket = tls.createServer({ key, cert, requestCert, ca }, socket => this._onTcpClientConnected(socket))
+      socket = tls.createServer({ key, cert, requestCert, ca }, (socket) => {
+        this._codec = new MLLPCodec()
+        this._onTcpClientConnected(socket)
+      })
     } else {
-      socket = net.createServer(socket => this._onTcpClientConnected(socket))
+      socket = net.createServer((socket) => {
+        this._codec = new MLLPCodec()
+        this._onTcpClientConnected(socket)
+      })
     }
 
     socket.on('error', err => {
@@ -134,36 +145,32 @@ export class Inbound extends EventEmitter implements Inbound {
 
   /** @internal */
   private _onTcpClientConnected (socket: Socket): void {
-    // set message
-    let loadedMessage: string = ''
-
     // add socked connection to array
     this._sockets.push(socket)
 
     // no delay in processing the message
     socket.setNoDelay(true)
 
-    // set encoding
-    socket.setEncoding(this._opt.encoding)
-
     socket.on('data', (buffer) => {
       socket.cork()
 
-      // we got a message, we don't care if it's good or not
-      ++this.stats.received
-
       try {
-        // set message
-        loadedMessage += buffer.toString().replace(PROTOCOL_MLLP_HEADER, '')
+        this._dataResult = this._codec?.receiveData(buffer)
+      } catch (err) {
+        this.emit('data.error', err)
+      }
 
-        // is there is F5 and CR in this message?
-        if (loadedMessage.includes(PROTOCOL_MLLP_FOOTER)) {
-          // strip them out
-          loadedMessage = loadedMessage.replace(PROTOCOL_MLLP_FOOTER, '')
+      socket.uncork()
 
+      if (this._dataResult === true) {
+        // we got a message, we don't care if it's good or not
+        ++this.stats.received
+
+        const loadedMessage = this._codec?.getLastMessage()
+
+        try {
           // copy completed message to continue processing and clear the buffer
           const completedMessageCopy = JSON.parse(JSON.stringify(loadedMessage))
-          loadedMessage = ''
 
           // parser either is batch or a message
           let parser: FileBatch | Batch | Message
@@ -221,12 +228,10 @@ export class Inbound extends EventEmitter implements Inbound {
             // on a response sent, tell the inbound listener
             void this._handler(req, res)
           }
+        } catch (err) {
+          this.emit('data.error', err)
         }
-      } catch (err) {
-        this.emit('data.error', err)
       }
-
-      socket.uncork()
     })
 
     socket.on('error', err => {

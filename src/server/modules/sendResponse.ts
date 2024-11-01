@@ -10,8 +10,8 @@ import {
   HL7_2_5,
   HL7_2_5_1, HL7_2_6, HL7_2_7, HL7_2_7_1, HL7_2_8
 } from 'node-hl7-client/hl7'
-import { PROTOCOL_MLLP_FOOTER, PROTOCOL_MLLP_HEADER } from '../../utils/constants.js'
 import type { ListenerOptions } from '../../utils/normalize.js'
+import { MLLPCodec } from '../../utils/codec.js'
 
 /**
  * Send Response
@@ -26,6 +26,7 @@ export class SendResponse extends EventEmitter {
   private readonly _message: Message
   /** @internal */
   private readonly _mshOverrides: ListenerOptions['mshOverrides']
+  private _codec: MLLPCodec;
 
   constructor (socket: Socket, message: Message, mshOverrides?: ListenerOptions['mshOverrides']) {
     super()
@@ -33,6 +34,7 @@ export class SendResponse extends EventEmitter {
     this._message = message
     this._mshOverrides = mshOverrides
     this._socket = socket
+    this._codec = new MLLPCodec()
   }
 
   /**
@@ -40,6 +42,7 @@ export class SendResponse extends EventEmitter {
    * @since 1.0.0
    * @see {@link https://hl7-definition.caristix.com/v2/HL7v2.1/Tables/0008}
    * @param type
+   * @param encoding
    * @example
    * If you are to confirm to the end user (client) that the message they sent was good and processed successfully.
    * you would send an "AA" style message (Application Accept).
@@ -73,14 +76,14 @@ export class SendResponse extends EventEmitter {
    * "AE" (Application Error) will be automatically sent if there is a problem creating either an "AA" or "AR"
    * message from the original message sent because the original message structure sent wrong in the first place.
    */
-  async sendResponse (type: 'AA' | 'AR' | 'AE'): Promise<void> {
+  async sendResponse (type: 'AA' | 'AR' | 'AE', encoding: BufferEncoding = 'utf-8'): Promise<void> {
     try {
       this._ack = this._createAckMessage(type, this._message)
-      this._socket.write(Buffer.from(`${PROTOCOL_MLLP_HEADER}${this._ack.toString()}${PROTOCOL_MLLP_FOOTER}`))
     } catch (_e: any) {
       this._ack = this._createAEAckMessage()
-      this._socket.write(Buffer.from(`${PROTOCOL_MLLP_HEADER}${this._ack.toString()}${PROTOCOL_MLLP_FOOTER}`))
     }
+
+    this._codec.sendMessage(this._socket, this._ack.toString(), encoding)
 
     // we are sending a response back, why not?
     this.emit('response.sent')
