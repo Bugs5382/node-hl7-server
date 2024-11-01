@@ -1,3 +1,11 @@
+## [3.0.1-beta.1](https://github.com/Bugs5382/node-hl7-server/compare/v3.0.0...v3.0.1-beta.1) (2024-11-01)
+
+
+### Bug Fixes
+
+* 102 fix loadedmessage is not cleared after messages handled ([#111](https://github.com/Bugs5382/node-hl7-server/issues/111)) ([59cf172](https://github.com/Bugs5382/node-hl7-server/commit/59cf17246f033af550ded886e30fd9289ac78ff1))
+* **102:** Clear accumulated message between HL7 messages/requests.  ([#110](https://github.com/Bugs5382/node-hl7-server/issues/110)) ([ae7d002](https://github.com/Bugs5382/node-hl7-server/commit/ae7d00204631b0873ed178a91944f921ad93d70a))
+
 # [3.0.0](https://github.com/Bugs5382/node-hl7-server/compare/v2.5.0...v3.0.0) (2024-09-21)
 
 
