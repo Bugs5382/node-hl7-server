@@ -15,6 +15,3 @@ RUN npm i node-hl7-server
 
 ## Expose
 EXPOSE 3000
-
-## Command
-CMD ["npm","run", "server"]
