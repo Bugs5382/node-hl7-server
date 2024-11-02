@@ -60,6 +60,10 @@ export class Inbound extends EventEmitter implements Inbound {
   /** @internal */
   private readonly _sockets: Socket[]
   /** @internal */
+  private _dataResult: boolean | undefined
+  /** @internal */
+  private _codec: MLLPCodec | null
+  /** @internal */
   readonly stats = {
     /** Total message received to server.
      * @since 2.0.0 */
@@ -68,9 +72,6 @@ export class Inbound extends EventEmitter implements Inbound {
      * @since 2.0.0 */
     totalMessage: 0
   }
-
-  private _dataResult: boolean | undefined
-  private _codec: MLLPCodec | null
 
   /**
    * Build a Listener
@@ -169,13 +170,13 @@ export class Inbound extends EventEmitter implements Inbound {
         const loadedMessage = this._codec?.getLastMessage()
 
         try {
-          // copy completed message to continue processing and clear the buffer
+          // copy the completed message to continue processing and clear the buffer
           const completedMessageCopy = JSON.parse(JSON.stringify(loadedMessage))
 
           // parser either is batch or a message
           let parser: FileBatch | Batch | Message
 
-          // send raw information to the emit
+          // send raw information to the emitting
           this.emit('data.raw', completedMessageCopy)
 
           if (isFile(completedMessageCopy)) {

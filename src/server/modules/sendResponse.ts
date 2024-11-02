@@ -26,7 +26,8 @@ export class SendResponse extends EventEmitter {
   private readonly _message: Message
   /** @internal */
   private readonly _mshOverrides: ListenerOptions['mshOverrides']
-  private _codec: MLLPCodec;
+  /** @internal */
+  private readonly _codec: MLLPCodec
 
   constructor (socket: Socket, message: Message, mshOverrides?: ListenerOptions['mshOverrides']) {
     super()
