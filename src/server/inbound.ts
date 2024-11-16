@@ -1,12 +1,15 @@
-import EventEmitter from 'events'
-import net, { Socket } from 'net'
-import tls from 'tls'
-import { FileBatch, Batch, Message, isBatch, isFile } from 'node-hl7-client'
-import { PROTOCOL_MLLP_FOOTER, PROTOCOL_MLLP_HEADER } from '../utils/constants.js'
-import { ListenerOptions, normalizeListenerOptions } from '../utils/normalize.js'
-import { InboundRequest } from './modules/inboundRequest.js'
-import { SendResponse } from './modules/sendResponse.js'
-import { Server } from './server.js'
+import EventEmitter from "events";
+import net, { Socket } from "net";
+import tls from "tls";
+import { FileBatch, Batch, Message, isBatch, isFile } from "node-hl7-client";
+import {
+  ListenerOptions,
+  normalizeListenerOptions,
+} from "../utils/normalize.js";
+import { InboundRequest } from "./modules/inboundRequest.js";
+import { SendResponse } from "./modules/sendResponse.js";
+import { Server } from "./server.js";
+import { MLLPCodec } from "../utils/codec.js";
 
 /**
  * Inbound Handler
@@ -21,28 +24,26 @@ import { Server } from './server.js'
  *  })
  *```
  */
-export type InboundHandler = (req: InboundRequest, res: SendResponse) => void
+export type InboundHandler = (req: InboundRequest, res: SendResponse) => void;
 
-/* eslint-disable */
 export interface Inbound extends EventEmitter {
   /** When the connection form the client is closed. We might have an error, we might not. */
-  on(name: 'client.close', cb: (hasError: boolean) => void): this;
+  on(name: "client.close", cb: (hasError: boolean) => void): this;
   /** When a connection from the client is made. */
-  on(name: 'client.connect', cb: (socket: Socket) => void): this;
+  on(name: "client.connect", cb: (socket: Socket) => void): this;
   /** When an error was sent by the connecting source. */
-  on(name: 'client.error', cb: (err: any) => void): this;
+  on(name: "client.error", cb: (err: any) => void): this;
   /** Something wrong happened during data parsing. */
-  on(name: 'data.error', cb: (err: any) => void): this;
+  on(name: "data.error", cb: (err: any) => void): this;
   /** The raw data received by this particular inbound connection. */
-  on(name: 'data.raw', cb: (rawData: string) => void): this;
+  on(name: "data.raw", cb: (rawData: string) => void): this;
   /** When the socket itself has an error. */
-  on(name: 'error', cb: (err: any) => void): this;
+  on(name: "error", cb: (err: any) => void): this;
   /** When the socket is ready and listening on the port. */
-  on(name: 'listen', cb: () => void): this;
+  on(name: "listen", cb: () => void): this;
   /** An HL7 response was sent */
-  on(name: 'response.sent', cb: () => void): this;
+  on(name: "response.sent", cb: () => void): this;
 }
-/* eslint-enable */
 
 /**
  * Inbound Listener Class
@@ -50,15 +51,19 @@ export interface Inbound extends EventEmitter {
  */
 export class Inbound extends EventEmitter implements Inbound {
   /** @internal */
-  private readonly _handler: (req: InboundRequest, res: SendResponse) => void
+  private readonly _handler: (req: InboundRequest, res: SendResponse) => void;
   /** @internal */
-  _main: Server
+  _main: Server;
   /** @internal */
-  _opt: ReturnType<typeof normalizeListenerOptions>
+  _opt: ReturnType<typeof normalizeListenerOptions>;
   /** @internal */
-  private readonly _socket: net.Server | tls.Server
+  private readonly _socket: net.Server | tls.Server;
   /** @internal */
-  private readonly _sockets: Socket[]
+  private readonly _sockets: Socket[];
+  /** @internal */
+  private _dataResult: boolean | undefined;
+  /** @internal */
+  private _codec: MLLPCodec | null;
   /** @internal */
   readonly stats = {
     /** Total message received to server.
@@ -66,8 +71,8 @@ export class Inbound extends EventEmitter implements Inbound {
     received: 0,
     /** Total message parsed by the server..
      * @since 2.0.0 */
-    totalMessage: 0
-  }
+    totalMessage: 0,
+  };
 
   /**
    * Build a Listener
@@ -76,171 +81,191 @@ export class Inbound extends EventEmitter implements Inbound {
    * @param props
    * @param handler
    */
-  constructor (server: Server, props: ListenerOptions, handler: InboundHandler) {
-    super()
+  constructor(server: Server, props: ListenerOptions, handler: InboundHandler) {
+    super();
 
-    this._handler = handler
-    this._main = server
+    this._handler = handler;
+    this._main = server;
 
-    this._opt = normalizeListenerOptions(props)
+    this._opt = normalizeListenerOptions(props);
 
-    this._sockets = []
+    this._sockets = [];
 
-    this._listen = this._listen.bind(this)
-    this._onTcpClientConnected = this._onTcpClientConnected.bind(this)
+    this._listen = this._listen.bind(this);
+    this._onTcpClientConnected = this._onTcpClientConnected.bind(this);
 
-    this._socket = this._listen()
+    this._codec = null;
+
+    this._socket = this._listen();
   }
 
   /** Close Listener Instance.
    * This be called for each listener, but if the server instance is closed and shut down, this will also fire off.
    * @since 1.0.0 */
-  async close (): Promise<boolean> {
+  async close(): Promise<boolean> {
     this._sockets.forEach((socket) => {
-      socket.destroy()
-    })
+      socket.destroy();
+    });
 
     this._socket?.close(() => {
-      this._socket?.unref()
-    })
+      this._socket?.unref();
+    });
 
-    return true
+    return true;
   }
 
   /** @internal */
-  private _listen (): net.Server | tls.Server {
-    let socket: net.Server | tls.Server
-    const port = this._opt.port
-    const bindAddress = this._main._opt.bindAddress
-    const ipv6 = this._main._opt.ipv6
+  private _listen(): net.Server | tls.Server {
+    let socket: net.Server | tls.Server;
+    const port = this._opt.port;
+    const bindAddress = this._main._opt.bindAddress;
+    const ipv6 = this._main._opt.ipv6;
 
-    if (typeof this._main._opt.tls !== 'undefined') {
-      const { key, cert, requestCert, ca } = this._main._opt.tls
-      socket = tls.createServer({ key, cert, requestCert, ca }, socket => this._onTcpClientConnected(socket))
+    if (typeof this._main._opt.tls !== "undefined") {
+      const { key, cert, requestCert, ca } = this._main._opt.tls;
+      socket = tls.createServer({ key, cert, requestCert, ca }, (socket) => {
+        this._codec = new MLLPCodec();
+        this._onTcpClientConnected(socket);
+      });
     } else {
-      socket = net.createServer(socket => this._onTcpClientConnected(socket))
+      socket = net.createServer((socket) => {
+        this._codec = new MLLPCodec();
+        this._onTcpClientConnected(socket);
+      });
     }
 
-    socket.on('error', err => {
-      this.emit('error', err)
-    })
+    socket.on("error", (err) => {
+      this.emit("error", err);
+    });
 
     socket.listen({ port, ipv6Only: ipv6, hostname: bindAddress }, () => {
-      this.emit('listen')
-    })
+      this.emit("listen");
+    });
 
-    return socket
+    return socket;
   }
 
   /** @internal */
-  private _onTcpClientConnected (socket: Socket): void {
-    // set message
-    let loadedMessage: string = ''
-
+  private _onTcpClientConnected(socket: Socket): void {
     // add socked connection to array
-    this._sockets.push(socket)
+    this._sockets.push(socket);
 
     // no delay in processing the message
-    socket.setNoDelay(true)
+    socket.setNoDelay(true);
 
-    // set encoding
-    socket.setEncoding(this._opt.encoding)
-
-    socket.on('data', (buffer) => {
-      socket.cork()
-
-      // we got a message, we don't care if it's good or not
-      ++this.stats.received
+    socket.on("data", (buffer) => {
+      socket.cork();
 
       try {
-        // set message
-        loadedMessage += buffer.toString().replace(PROTOCOL_MLLP_HEADER, '')
+        this._dataResult = this._codec?.receiveData(buffer);
+      } catch (err) {
+        this.emit("data.error", err);
+      }
 
-        // is there is F5 and CR in this message?
-        if (loadedMessage.includes(PROTOCOL_MLLP_FOOTER)) {
-          // strip them out
-          loadedMessage = loadedMessage.replace(PROTOCOL_MLLP_FOOTER, '')
+      socket.uncork();
+
+      if (this._dataResult === true) {
+        // we got a message, we don't care if it's good or not
+        ++this.stats.received;
+
+        const loadedMessage = this._codec?.getLastMessage();
+
+        try {
+          // copy the completed message to continue processing and clear the buffer
+          const completedMessageCopy = JSON.parse(
+            JSON.stringify(loadedMessage),
+          );
 
           // parser either is batch or a message
-          let parser: FileBatch | Batch | Message
+          let parser: FileBatch | Batch | Message;
 
-          // send raw information to the emit
-          this.emit('data.raw', loadedMessage)
+          // send raw information to the emitting
+          this.emit("data.raw", completedMessageCopy);
 
-          if (isFile(loadedMessage)) {
+          if (isFile(completedMessageCopy)) {
             // parser the batch
-            parser = new FileBatch({ text: loadedMessage })
+            parser = new FileBatch({ text: completedMessageCopy });
             // load the messages
-            const allMessage = parser.messages()
+            const allMessage = parser.messages();
             allMessage.forEach((message: Message) => {
               // parse this message
-              const messageParsed = new Message({ text: message.toString() })
+              const messageParsed = new Message({ text: message.toString() });
               // increase the total message
-              ++this.stats.totalMessage
+              ++this.stats.totalMessage;
               // create the inbound request
-              const req = new InboundRequest(messageParsed, { type: 'file' })
+              const req = new InboundRequest(messageParsed, { type: "file" });
               // create the send response function
-              const res = new SendResponse(socket, message, this._opt.mshOverrides)
+              const res = new SendResponse(
+                socket,
+                message,
+                this._opt.mshOverrides,
+              );
               // on a response sent, tell the inbound listener
-              res.on('response.sent', () => {
-                this.emit('response.sent')
-              })
-              void this._handler(req, res)
-            })
-          } else if (isBatch(loadedMessage)) {
+              res.on("response.sent", () => {
+                this.emit("response.sent");
+              });
+              void this._handler(req, res);
+            });
+          } else if (isBatch(completedMessageCopy)) {
             // parser the batch
-            parser = new Batch({ text: loadedMessage })
+            parser = new Batch({ text: completedMessageCopy });
             // load the messages
-            const allMessage = parser.messages()
+            const allMessage = parser.messages();
             // loop messages
             allMessage.forEach((message: Message) => {
               // parse this message
-              const messageParsed = new Message({ text: message.toString() })
+              const messageParsed = new Message({ text: message.toString() });
               // increase the total message
-              ++this.stats.totalMessage
+              ++this.stats.totalMessage;
               // create the inbound request
-              const req = new InboundRequest(messageParsed, { type: 'file' })
+              const req = new InboundRequest(messageParsed, { type: "file" });
               // create the send response function
-              const res = new SendResponse(socket, messageParsed, this._opt.mshOverrides)
+              const res = new SendResponse(
+                socket,
+                messageParsed,
+                this._opt.mshOverrides,
+              );
               // on a response sent, tell the inbound listener
-              void this._handler(req, res)
-            })
+              void this._handler(req, res);
+            });
           } else {
             // parse this message
-            const messageParsed = new Message({ text: loadedMessage })
+            const messageParsed = new Message({ text: completedMessageCopy });
             // increase the total message
-            ++this.stats.totalMessage
+            ++this.stats.totalMessage;
             // create the inbound request
-            const req = new InboundRequest(messageParsed, { type: 'file' })
+            const req = new InboundRequest(messageParsed, { type: "file" });
             // create the send response function
-            const res = new SendResponse(socket, messageParsed, this._opt.mshOverrides)
+            const res = new SendResponse(
+              socket,
+              messageParsed,
+              this._opt.mshOverrides,
+            );
             // on a response sent, tell the inbound listener
-            void this._handler(req, res)
+            void this._handler(req, res);
           }
+        } catch (err) {
+          this.emit("data.error", err);
         }
-      } catch (err) {
-        this.emit('data.error', err)
       }
+    });
 
-      socket.uncork()
-    })
+    socket.on("error", (err) => {
+      this.emit("client.error", err);
+      this._closeSocket(socket);
+    });
 
-    socket.on('error', err => {
-      this.emit('client.error', err)
-      this._closeSocket(socket)
-    })
+    socket.on("close", (hadError) => {
+      this.emit("client.close", hadError);
+      this._closeSocket(socket);
+    });
 
-    socket.on('close', hadError => {
-      this.emit('client.close', hadError)
-      this._closeSocket(socket)
-    })
-
-    this.emit('client.connect', socket)
+    this.emit("client.connect", socket);
   }
 
   /** @internal */
-  private _closeSocket (socket: Socket): void {
-    socket.destroy()
-    this._sockets.splice(this._sockets.indexOf(socket), 1)
+  private _closeSocket(socket: Socket): void {
+    socket.destroy();
+    this._sockets.splice(this._sockets.indexOf(socket), 1);
   }
 }
