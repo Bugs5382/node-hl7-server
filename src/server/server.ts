@@ -1,6 +1,10 @@
-import EventEmitter from 'events'
-import { Inbound, InboundHandler } from './inbound.js'
-import { ServerOptions, normalizeServerOptions, ListenerOptions } from '../utils/normalize.js'
+import EventEmitter from "events";
+import { Inbound, InboundHandler } from "./inbound.js";
+import {
+  ServerOptions,
+  normalizeServerOptions,
+  ListenerOptions,
+} from "../utils/normalize.js";
 
 /**
  * Server Class
@@ -10,7 +14,7 @@ import { ServerOptions, normalizeServerOptions, ListenerOptions } from '../utils
  */
 export class Server extends EventEmitter {
   /** @internal */
-  _opt: ReturnType<typeof normalizeServerOptions>
+  _opt: ReturnType<typeof normalizeServerOptions>;
 
   /**
    * @since 1.0.0
@@ -36,9 +40,9 @@ export class Server extends EventEmitter {
    *   ```
    *
    */
-  constructor (props?: ServerOptions) {
-    super()
-    this._opt = normalizeServerOptions(props)
+  constructor(props?: ServerOptions) {
+    super();
+    this._opt = normalizeServerOptions(props);
   }
 
   /** This creates an instance of a HL7 server.
@@ -56,7 +60,7 @@ export class Server extends EventEmitter {
    *```
    *
    * */
-  createInbound (props: ListenerOptions, cb: InboundHandler): Inbound {
-    return new Inbound(this, props, cb)
+  createInbound(props: ListenerOptions, cb: InboundHandler): Inbound {
+    return new Inbound(this, props, cb);
   }
 }

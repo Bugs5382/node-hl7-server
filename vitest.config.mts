@@ -9,8 +9,7 @@ export default defineConfig({
         'bin',
         'certs',
         'docs',
-        'lib',
-        'release.config.cjs'
+        'lib'
       ]
     }
   }
