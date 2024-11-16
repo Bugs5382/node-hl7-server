@@ -8,16 +8,15 @@ on:
       - develop
     types:
       - opened
+      - reopened
+      - ready_for_review
       - synchronize
 
+
 jobs:
+
   Build:
     runs-on: ubuntu-latest
-    services:
-      rabbitmq:
-        image: rabbitmq:4.0.2-alpine
-        ports:
-          - 5672:5672
     strategy:
       matrix:
         node-version: [20.x, 'lts/*', 'latest']
@@ -29,14 +28,19 @@ jobs:
         with:
           node-version: ${{matrix.node-version}}
 
-      - name: Run
+      - name: Pre-Run
         run: |
           npm install --package-lock-only
           npm install --ignore-scripts
-          npm run build
+
+      - name: Run Tests and Lint
+        run: |
+          npm run lint
           npm run test
-        env:
-          RABBITMQ_URL: amqp://guest:guest@localhost:5672
+
+      - name: Run Build
+        run: |
+          npm run build
 
       - name: Upload build artifact
         if: matrix.node-version == 'lts/*'
@@ -46,4 +50,6 @@ jobs:
           path: |
             package.json
             package-lock.json
+            README.md
+            LICENSE
             ./lib

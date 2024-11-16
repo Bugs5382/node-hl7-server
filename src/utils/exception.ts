@@ -2,12 +2,12 @@
  * @since 1.0.0 */
 class HL7Error extends Error {
   /** @internal */
-  code: number
+  code: number;
   /** @internal */
-  constructor (code: number, message: string) {
-    super(message)
-    this.name = 'HL7ServerError'
-    this.code = code
+  constructor(code: number, message: string) {
+    super(message);
+    this.name = "HL7ServerError";
+    this.code = code;
   }
 }
 
@@ -15,9 +15,9 @@ class HL7Error extends Error {
  * @since 1.0.0 */
 export class HL7ServerError extends HL7Error {
   /** @internal */
-  name = 'HL7ServerError'
-  constructor (message: string) {
-    super(500, message)
+  name = "HL7ServerError";
+  constructor(message: string) {
+    super(500, message);
   }
 }
 
@@ -25,5 +25,5 @@ export class HL7ServerError extends HL7Error {
  * @since 1.0.0 */
 export class HL7ListenerError extends Error {
   /** @internal */
-  name = 'HL7ListenerError'
+  name = "HL7ListenerError";
 }
