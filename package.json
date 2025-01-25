@@ -91,6 +91,7 @@
     "node-hl7-client": "^3.0.0"
   },
   "precommit": [
+    "format",
     "lint:fix",
     "build"
   ]
