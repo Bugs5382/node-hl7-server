@@ -156,15 +156,36 @@ describe("node hl7 end to end - client", () => {
       let dfd = createDeferred<void>();
 
       const server = new Server({ bindAddress: "0.0.0.0" });
-      // override MSH field 9.3 to "ACK" and field 18 to "UNICODE UTF-8"
       const listener = server.createInbound(
-        { port, mshOverrides: { "9.3": "ACK", "18": "UNICODE UTF-8" } },
+        {
+          port,
+          mshOverrides: {
+            // override: set MSH.7 to timestamp of an original message + 1 ms
+            "7": (message) => `${Number(message.get("MSH.7").toString()) + 1}`,
+            // override: set MSH.8 to "FOO" via callback
+            "8": () => "FOO",
+            // override: set MSH.9.3 to "ACK"
+            "9.3": "ACK",
+            // override: set MSH.18 to "UNICODE UTF-8"
+            "18": "UNICODE UTF-8",
+          },
+        },
         async (req, res) => {
           const messageReq = req.getMessage();
           expect(messageReq.get("MSH.12").toString()).toBe("2.7");
           await res.sendResponse("AA");
           const messageRes = res.getAckMessage();
+
           expect(messageRes?.get("MSA.1").toString()).toBe("AA");
+
+          const messageReqTimestamp = Number(
+            messageReq?.get("MSH.7").toString(),
+          );
+          const messageResTimestamp = Number(
+            messageRes?.get("MSH.7").toString(),
+          );
+          expect(messageResTimestamp).toBe(messageReqTimestamp + 1);
+          expect(messageRes?.get("MSH.8").toString()).toBe("FOO");
           expect(messageRes?.get("MSH.9.3").toString()).toBe("ACK");
           expect(messageRes?.get("MSH.18").toString()).toBe("UNICODE UTF-8");
         },

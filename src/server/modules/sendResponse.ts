@@ -167,9 +167,13 @@ export class SendResponse extends EventEmitter {
     ackMessage.set("MSH.6", message.get("MSH.4").toString());
     ackMessage.set("MSH.12", message.get("MSH.12").toString());
 
+    // process MSH field overrides if set
     if (typeof this._mshOverrides === "object") {
-      Object.entries(this._mshOverrides).forEach(([path, value]) => {
-        ackMessage.set(`MSH.${path}`, value);
+      Object.entries(this._mshOverrides).forEach(([path, override]) => {
+        ackMessage.set(
+          `MSH.${path}`,
+          typeof override === "function" ? override(message) : override,
+        );
       });
     }
 

@@ -106,11 +106,20 @@ Please consult [node-hl7-client](https://www.npmjs.com/package/node-hl7-client) 
 ### Override response MSH fields
 
 Individual response MSH segment fields can be overridden by passing the optional `mshOverrides` prop to `server.createInbound`.
+Each field's override can be specified either directly or as a callback that takes the inbound message as an argument
+and returns the field value.
 
-For example, the following overrides the default MSH field 9.3 value to "ACK":
+For example:
 
 ```ts
- const listener = server.createInbound({ port: 3000, mshOverrides: { '9.3': 'ACK' }}, async (req, res) => {})
+const listener = server.createInbound({ port: 3000, mshOverrides: {
+    // set MSH.7 to formatted timestamp representing time of response creation
+    '7': () => format(new Date(), 'yyyyMMddHHmmssxx'),
+    // set MSH.9.3 to "ACK"
+    '9.3': 'ACK',
+    // copy MSH.12 value from inbound message to response
+    '12': (message: Message) => message.get('MSH.12').toString()
+}}, async (req, res) => {})
 ```
 
 ## Docker
@@ -136,7 +145,7 @@ You can view it [here](https://bugs5382.github.io/node-hl7-server/).
 ## Acknowledgements
 
 - Code Design/Auto Re-Connect/Resend, Inspiration: [node-rabbitmq-client](https://github.com/cody-greene/node-rabbitmq-client)
-- My Wife and Baby Girl.
+- My Wife, Baby Girl, abd Baby Boy.
 
 ## License
 
