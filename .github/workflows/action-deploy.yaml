@@ -1,5 +1,6 @@
 name: Release and Publish
 on:
+  workflow_dispatch:
   release:
     types:
       - released
@@ -51,7 +52,6 @@ jobs:
       - name: Update Version in Package.json
         id: set-npm-tag
         run: |
-          npm version $CLEAN_TAG --no-git-tag-version
           if [[ "$CLEAN_TAG" == *"beta"* ]]; then
             echo "NPM_TAG=beta" >> $GITHUB_OUTPUT
             echo "GIT_BRANCH_TARGET=develop" >> $GITHUB_OUTPUT
