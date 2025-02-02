@@ -25,24 +25,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Strip "v" from Tag
-        if: github.ref_name == 'main'
-        run: echo "CLEAN_TAG=${GITHUB_EVENT_RELEASE_TAG_NAME#v}" >> $GITHUB_OUTPUT
-        env:
-          GITHUB_EVENT_RELEASE_TAG_NAME: ${{ github.event.release.tag_name }}
-
-      - name: Update Version in Package.json
-        if: github.ref_name == 'main'
-        run: |
-          NEW_VERSION=${{ steps.release_drafter.outputs.tag_name }}
-          npm version $CLEAN_TAG --no-git-tag-version
-
-      - name: Commit and Push Version Update
-        if: github.ref_name == 'main'
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: "chore(pre-release): update package.json version: $CLEAN_TAG [skip ci]"
-
       - name: Update Release Draft
         id: release_drafter
         if: github.ref_name == 'main'
@@ -51,3 +33,19 @@ jobs:
           commitish: ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Strip "v" from Tag
+        if: github.ref_name == 'main'
+        run: echo "CLEAN_TAG=${GITHUB_EVENT_RELEASE_TAG_NAME#v}" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_EVENT_RELEASE_TAG_NAME: ${{ steps.release_drafter.outputs.tag_name }}
+
+      - name: Update Version in Package.json
+        if: github.ref_name == 'main'
+        run: npm version $CLEAN_TAG --no-git-tag-version
+
+      - name: Commit and Push Version Update
+        if: github.ref_name == 'main'
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "chore(pre-release): update package.json version: $CLEAN_TAG [skip ci]"
