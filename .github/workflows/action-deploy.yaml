@@ -1,6 +1,5 @@
 name: Release and Publish
 on:
-  workflow_dispatch:
   release:
     types:
       - released
@@ -88,10 +87,6 @@ jobs:
             package.json
             CHANGELOG.md
           sparse-checkout-cone-mode: false
-
-      - name: Update Version in Package.json
-        id: set-git-branch
-        run: npm version $CLEAN_TAG --no-git-tag-version
 
       - name: Update Changelog
         uses: stefanzweifel/changelog-updater-action@v1
