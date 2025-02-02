@@ -9,14 +9,14 @@ import {
 } from "node-hl7-client";
 import { HL7ListenerError, HL7ServerError } from "./exception.js";
 
-const DEFAULT_SERVER_OPTS = {
+const DEFAULT_SERVER_OPTS: Partial<ServerOptions> = {
   bindAddress: "0.0.0.0",
   encoding: "utf-8",
   ipv4: true,
   ipv6: false,
 };
 
-const DEFAULT_LISTENER_OPTS = {
+const DEFAULT_LISTENER_OPTS: Partial<ListenerOptions> = {
   encoding: "utf-8",
 };
 
@@ -27,6 +27,10 @@ export interface ServerOptions {
   /** The network address to listen on expediently.
    * @default 0.0.0.0 */
   bindAddress?: string;
+  /** Encoding of the messages we expect from the HL7 message.
+   * @default "utf-8"
+   */
+  encoding?: BufferEncoding;
   /** IPv4 Only - If this is set to true, only IPv4 address will be used.
    * @default false */
   ipv4?: boolean;
@@ -44,6 +48,10 @@ export interface ServerOptions {
  * @since 1.0.0
  */
 export interface ListenerOptions {
+  /** Encoding of the messages we expect from the HL7 message.
+   * @default "utf-8"
+   */
+  encoding?: BufferEncoding;
   /** Optional MSH segment overrides. See the readme for examples.
    * @since 2.5.0 */
   mshOverrides?: Record<string, string | ((message: Message) => string)>;
@@ -53,87 +61,99 @@ export interface ListenerOptions {
   /** The network address to listen on expediently.
    * Must be set between 0 and 65353 */
   port: number;
-  /** Encoding of the messages we expect from the HL7 message.
-   * @default "utf-8"
-   */
-  encoding?: BufferEncoding;
 }
 
 /**
  * @since 1.0.0
  */
-type ValidatedKeys = "name" | "port" | "encoding";
+type ValidatedKeys = "port";
 
 /**
  * @since 1.0.0
  */
 interface ValidatedOptions
   extends Pick<Required<ListenerOptions>, ValidatedKeys> {
-  mshOverrides?: Record<string, string>;
-  name: string;
+  mshOverrides?: Record<string, string | ((message: Message) => string)>;
+  name?: string;
   port: number;
 }
 
 /** @internal */
-export function normalizeServerOptions(raw?: ServerOptions): ServerOptions {
-  const props: any = { ...DEFAULT_SERVER_OPTS, ...raw };
+export function normalizeServerOptions(props?: ServerOptions): ServerOptions {
+  const merged: ServerOptions = {
+    ...DEFAULT_SERVER_OPTS,
+    ...(props || {}),
+  };
 
-  if (props.ipv4 === true && props.ipv6 === true) {
+  if (merged.ipv4 === true && merged.ipv6 === true) {
     throw new HL7ServerError(
       "ipv4 and ipv6 both can't be set to be exclusive.",
     );
   }
 
-  if (typeof props.bindAddress !== "string") {
+  if (typeof merged.bindAddress !== "string") {
     throw new HL7ServerError("bindAddress is not valid string.");
-  } else if (props.bindAddress !== "localhost") {
+  } else if (merged.bindAddress !== "localhost") {
     if (
-      typeof props.bindAddress !== "undefined" &&
-      props.ipv6 === true &&
-      !validIPv6(props.bindAddress)
+      typeof merged.bindAddress !== "undefined" &&
+      merged.ipv6 === true &&
+      !validIPv6(merged.bindAddress)
     ) {
       throw new HL7ServerError("bindAddress is an invalid ipv6 address.");
     }
 
     if (
-      typeof props.bindAddress !== "undefined" &&
-      props.ipv4 === true &&
-      !validIPv4(props.bindAddress)
+      typeof merged.bindAddress !== "undefined" &&
+      merged.ipv4 === true &&
+      !validIPv4(merged.bindAddress)
     ) {
       throw new HL7ServerError("bindAddress is an invalid ipv4 address.");
     }
   }
 
-  return props;
+  return merged;
 }
 
 /** @internal */
 export function normalizeListenerOptions(
-  raw?: ListenerOptions,
+  props: ListenerOptions,
 ): ValidatedOptions {
-  const props: any = { ...DEFAULT_LISTENER_OPTS, ...raw };
+  const merged: ListenerOptions = {
+    ...DEFAULT_LISTENER_OPTS,
+    ...(props || {}),
+  };
 
   const nameFormat = /[ `!@#$%^&*()+\-=\[\]{};':"\\|,.<>\/?~]/; //eslint-disable-line
 
-  if (typeof props.name === "undefined") {
-    props.name = randomString();
+  if (typeof merged.name === "undefined") {
+    merged.name = randomString();
   } else {
-    if (nameFormat.test(props.name)) {
+    if (nameFormat.test(merged.name)) {
       throw new HL7ListenerError(
         "name must not contain certain characters: `!@#$%^&*()+\\-=\\[\\]{};':\"\\\\|,.<>\\/?~.",
       );
     }
   }
 
-  if (typeof props.port === "undefined") {
+  if (typeof merged.mshOverrides === "object") {
+    Object.entries(merged.mshOverrides).forEach(([_path, override]) => {
+      if (typeof override !== "string" && typeof override !== "function") {
+        throw new HL7ListenerError(
+          "mshOverrides override value must be a string or a function.",
+        );
+      }
+    });
+  }
+
+  if (typeof merged.port === "undefined") {
     throw new HL7ListenerError("port is not defined.");
   }
 
-  if (typeof props.port !== "number") {
-    throw new HL7ListenerError("port is not valid number.");
+  if (typeof merged.port !== "number" || isNaN(merged.port)) {
+    throw new HL7ListenerError("port is not a valid number.");
   }
 
-  assertNumber(props, "port", 0, 65353);
+  assertNumber({ port: merged.port }, "port", 0, 65353);
 
-  return props;
+  return merged;
 }

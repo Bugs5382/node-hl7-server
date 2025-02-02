@@ -113,7 +113,7 @@ describe("node hl7 server", () => {
         // @ts-expect-error port is not specified
         server.createInbound({ port: "12345" }, async () => {});
       } catch (err: any) {
-        expect(err.message).toBe("port is not valid number.");
+        expect(err.message).toBe("port is not a valid number.");
       }
     });
 
@@ -139,12 +139,75 @@ describe("node hl7 server", () => {
       try {
         const server = new Server();
         server.createInbound(
-          { name: "$#@!sdfe-`", port: 65354 },
+          { name: "$#@!sdfe-`", port: 65353 },
           async () => {},
         );
       } catch (err: any) {
         expect(err.message).toContain(
           "name must not contain certain characters: `!@#$%^&*()+\\-=\\[\\]{};':\"\\\\|,.<>\\/?~.",
+        );
+      }
+    });
+
+    test("error - mshOverride invalid override value type .. as boolean", async () => {
+      try {
+        const server = new Server();
+        server.createInbound(
+          {
+            name: "mshOverride",
+            port: 4000,
+            mshOverrides: {
+              // @ts-expect-error value must be a string
+              "9.3": true,
+            },
+          },
+          async () => {},
+        );
+      } catch (err: any) {
+        expect(err.message).toContain(
+          "mshOverrides override value must be a string or a function.",
+        );
+      }
+    });
+
+    test("error - mshOverride invalid override value type .. as number", async () => {
+      try {
+        const server = new Server();
+        server.createInbound(
+          {
+            name: "mshOverride",
+            port: 4000,
+            mshOverrides: {
+              // @ts-expect-error value must be a string
+              "9.3": 1,
+            },
+          },
+          async () => {},
+        );
+      } catch (err: any) {
+        expect(err.message).toContain(
+          "mshOverrides override value must be a string or a function.",
+        );
+      }
+    });
+
+    test("error - mshOverride invalid override value type .. as float", async () => {
+      try {
+        const server = new Server();
+        server.createInbound(
+          {
+            name: "mshOverride",
+            port: 4000,
+            mshOverrides: {
+              // @ts-expect-error value must be a string
+              "9.3": 1.1,
+            },
+          },
+          async () => {},
+        );
+      } catch (err: any) {
+        expect(err.message).toContain(
+          "mshOverrides override value must be a string or a function.",
         );
       }
     });
