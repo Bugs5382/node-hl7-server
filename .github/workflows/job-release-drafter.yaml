@@ -57,6 +57,6 @@ jobs:
       - name: Commit and Push Version Update
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "chore(pre-release): update package.json version: $CLEAN_TAG [skip ci]"
+          commit_message: "chore(pre-release): update package.json version [skip ci]"
         env:
           CLEAN_TAG: ${{ steps.strip_version.outputs.CLEAN_TAG }}
