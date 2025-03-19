@@ -124,12 +124,12 @@ export class Inbound extends EventEmitter implements Inbound {
     if (typeof this._main._opt.tls !== "undefined") {
       const { key, cert, requestCert, ca } = this._main._opt.tls;
       socket = tls.createServer({ key, cert, requestCert, ca }, (socket) => {
-        this._codec = new MLLPCodec();
+        this._codec = new MLLPCodec(this._main._opt.encoding);
         this._onTcpClientConnected(socket);
       });
     } else {
       socket = net.createServer((socket) => {
-        this._codec = new MLLPCodec();
+        this._codec = new MLLPCodec(this._main._opt.encoding);
         this._onTcpClientConnected(socket);
       });
     }
