@@ -19,9 +19,7 @@ import { MLLPCodec } from "../../utils/codec.js";
 
 const MSA_1_VALUES_v2_1 = ["AA", "AR", "AE"];
 const MSA_1_VALUES_v2_x = ["CA", "CR", "CE"];
-type Valid_MSA_1 =
-  | (typeof MSA_1_VALUES_v2_1)[number]
-  | (typeof MSA_1_VALUES_v2_x)[number];
+type Valid_MSA_1 = "AA" | "AR" | "AE" | "CA" | "CR" | "CE" ;
 
 /**
  * Send Response
