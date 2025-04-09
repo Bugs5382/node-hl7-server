@@ -17,6 +17,12 @@ import {
 import type { ListenerOptions } from "../../utils/normalize.js";
 import { MLLPCodec } from "../../utils/codec.js";
 
+const MSA_1_VALUES_v2_1 = ["AA", "AR", "AE"];
+const MSA_1_VALUES_v2_x = ["CA", "CR", "CE"];
+type Valid_MSA_1 =
+  | (typeof MSA_1_VALUES_v2_1)[number]
+  | (typeof MSA_1_VALUES_v2_x)[number];
+
 /**
  * Send Response
  * @since 1.0.0
@@ -86,7 +92,7 @@ export class SendResponse extends EventEmitter {
    * message from the original message sent because the original message structure sent wrong in the first place.
    */
   async sendResponse(
-    type: "AA" | "AR" | "AE",
+    type: Valid_MSA_1,
     encoding: BufferEncoding = "utf-8",
   ): Promise<void> {
     try {
@@ -112,9 +118,10 @@ export class SendResponse extends EventEmitter {
   }
 
   /** @internal */
-  private _createAckMessage(type: string, message: Message): Message {
+  private _createAckMessage(type: Valid_MSA_1, message: Message): Message {
     let specClass;
     const spec = message.get("MSH.12").toString();
+    this._validateMSA1(spec, type);
     switch (spec) {
       case "2.1":
         specClass = new HL7_2_1();
@@ -182,6 +189,24 @@ export class SendResponse extends EventEmitter {
     segment.set("2", message.get("MSH.10").toString());
 
     return ackMessage;
+  }
+
+  /** @internal */
+  private _validateMSA1(spec: string, type: Valid_MSA_1): void {
+    switch (spec) {
+      case "2.1":
+        if (!MSA_1_VALUES_v2_1.includes(type)) {
+          throw new Error(`Invalid MSA-1 value: ${type} for HL7 version 2.1`);
+        }
+        break;
+      default:
+        if (![...MSA_1_VALUES_v2_1, ...MSA_1_VALUES_v2_x].includes(type)) {
+          throw new Error(
+            `Invalid MSA-1 value: ${type} for HL7 version ${spec}`,
+          );
+        }
+        break;
+    }
   }
 
   /** @internal */
