@@ -122,6 +122,25 @@ const listener = server.createInbound({ port: 3000, mshOverrides: {
 }}, async (req, res) => {})
 ```
 
+### Send ACK
+
+Once you finish processing the received message, you should send an ACK message as a confirmation. You can choose what MSA1
+value should be sent depending on the validity of the inbound message received.
+
+For example:
+
+```ts
+const IB_ADT = server.createInbound({port: LISTEN_PORT}, async (req, res) => {
+    const messageReq = req.getMessage()
+    const hl7Version = messageReq.get('MSH.12').toString(),
+
+    // If the message is valid, we send AA or CA.
+    // IMPORTANT: Notice CA, CE and CR can only be sent for HL7 versions > 2.1
+    // If hl7Version is 2.1 and any of the aforementioned is sent, the response automatically sends an AE.
+    res.sendResponse("AA")
+})
+```
+
 ## Docker
 
 ```
