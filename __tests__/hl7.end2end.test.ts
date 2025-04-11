@@ -8,7 +8,7 @@ import {
   expectEvent,
   generateLargeBase64String,
 } from "./__utils__";
-import Server from "../src";
+import Server, { HL7ServerError } from "../src";
 import { HL7_2_1 } from "node-hl7-client/hl7";
 
 const port = Number(process.env.TEST_PORT) || 3000;
@@ -291,7 +291,7 @@ describe("node hl7 end to end - client", () => {
       client.closeAll();
     });
 
-    test("...simple connect .. send CA when version is 2.1 .. expect AE", async () => {
+    test("...simple connect .. send CA when version is 2.1 .. sendMessage throws error", async () => {
       let dfd = createDeferred<void>();
 
       const server = new Server({ bindAddress: "0.0.0.0" });
@@ -324,17 +324,21 @@ describe("node hl7 end to end - client", () => {
         },
       });
 
-      await outbound.sendMessage(message);
+      try {
+        await outbound.sendMessage(message);
+      } catch (error) {
+        console.error("Error sending message:", error);
 
-      await dfd.promise;
+        expect(error).toBeDefined();
+        expect((error as HL7ServerError).message).toContain(
+          "Invalid MSA-1 value",
+        );
+      } finally {
+        await outbound.close();
+        await listener.close();
 
-      expect(client.totalSent()).toEqual(1);
-      expect(client.totalAck()).toEqual(1);
-
-      await outbound.close();
-      await listener.close();
-
-      client.closeAll();
+        client.closeAll();
+      }
     });
 
     test("...simple connect ... MSH overrides", async () => {

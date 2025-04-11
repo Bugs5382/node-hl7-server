@@ -97,6 +97,8 @@ export class SendResponse extends EventEmitter {
     try {
       this._ack = this._createAckMessage(type, this._message);
     } catch (_e: any) {
+      if (_e instanceof HL7ServerError) throw _e;
+
       this._ack = this._createAEAckMessage();
     }
 
