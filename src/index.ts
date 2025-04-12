@@ -10,4 +10,5 @@ export {
   InboundRequest,
   InboundRequestProps,
 } from "./server/modules/inboundRequest.js";
+export { validMSA1 } from "./utils/constants.js";
 export { SendResponse } from "./server/modules/sendResponse.js";

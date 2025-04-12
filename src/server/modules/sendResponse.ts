@@ -90,6 +90,12 @@ export class SendResponse extends EventEmitter {
    *
    * "AE" (Application Error) will be automatically sent if there is a problem creating either an "AA" or "AR"
    * message from the original message sent because the original message structure sent wrong in the first place.
+   *
+   * If the sepc of the Hl7 message you get from the client, is 2.1, the value sent back can be  "AA", "AR", "AE".
+   * Anything above 2.1 and greater fields are valid "AA", "AR", "AE", "CA", "CR", and "CE".
+   * If a CE is sent back with 2.1 the system will send an error in which
+   * the server will fail to respond proeprlly back to the client.
+   *
    */
   async sendResponse(
     type: validMSA1,
@@ -122,8 +128,11 @@ export class SendResponse extends EventEmitter {
   /** @internal */
   private _createAckMessage(type: validMSA1, message: Message): Message {
     let specClass;
+    /** Get spec **/
     const spec = message.get("MSH.12").toString();
+    /** Check to see if MSA1 is valid. */
     this._validateMSA1(spec, type);
+    /** Get the class. */
     switch (spec) {
       case "2.1":
         specClass = new HL7_2_1();
