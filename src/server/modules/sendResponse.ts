@@ -16,6 +16,11 @@ import {
 } from "node-hl7-client/hl7";
 import type { ListenerOptions } from "../../utils/normalize.js";
 import { MLLPCodec } from "../../utils/codec.js";
+import { HL7ServerError } from "../../utils/exception.js";
+
+const MSA_1_VALUES_v2_1 = ["AA", "AR", "AE"];
+const MSA_1_VALUES_v2_x = ["CA", "CR", "CE"];
+type ValidMSA1 = "AA" | "AR" | "AE" | "CA" | "CR" | "CE";
 
 /**
  * Send Response
@@ -86,12 +91,14 @@ export class SendResponse extends EventEmitter {
    * message from the original message sent because the original message structure sent wrong in the first place.
    */
   async sendResponse(
-    type: "AA" | "AR" | "AE",
+    type: ValidMSA1,
     encoding: BufferEncoding = "utf-8",
   ): Promise<void> {
     try {
       this._ack = this._createAckMessage(type, this._message);
     } catch (_e: any) {
+      if (_e instanceof HL7ServerError) throw _e;
+
       this._ack = this._createAEAckMessage();
     }
 
@@ -112,9 +119,10 @@ export class SendResponse extends EventEmitter {
   }
 
   /** @internal */
-  private _createAckMessage(type: string, message: Message): Message {
+  private _createAckMessage(type: ValidMSA1, message: Message): Message {
     let specClass;
     const spec = message.get("MSH.12").toString();
+    this._validateMSA1(spec, type);
     switch (spec) {
       case "2.1":
         specClass = new HL7_2_1();
@@ -182,6 +190,26 @@ export class SendResponse extends EventEmitter {
     segment.set("2", message.get("MSH.10").toString());
 
     return ackMessage;
+  }
+
+  /** @internal */
+  private _validateMSA1(spec: string, type: ValidMSA1): void {
+    switch (spec) {
+      case "2.1":
+        if (!MSA_1_VALUES_v2_1.includes(type)) {
+          throw new HL7ServerError(
+            `Invalid MSA-1 value: ${type} for HL7 version 2.1`,
+          );
+        }
+        break;
+      default:
+        if (![...MSA_1_VALUES_v2_1, ...MSA_1_VALUES_v2_x].includes(type)) {
+          throw new HL7ServerError(
+            `Invalid MSA-1 value: ${type} for HL7 version ${spec}`,
+          );
+        }
+        break;
+    }
   }
 
   /** @internal */

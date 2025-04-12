@@ -8,7 +8,8 @@ import {
   expectEvent,
   generateLargeBase64String,
 } from "./__utils__";
-import Server from "../src";
+import Server, { HL7ServerError } from "../src";
+import { HL7_2_1 } from "node-hl7-client/hl7";
 
 const port = Number(process.env.TEST_PORT) || 3000;
 
@@ -150,6 +151,194 @@ describe("node hl7 end to end - client", () => {
       await listener.close();
 
       client.closeAll();
+    });
+
+    test("...simple connect .. send CA", async () => {
+      let dfd = createDeferred<void>();
+
+      const server = new Server({ bindAddress: "0.0.0.0" });
+      const listener = server.createInbound({ port }, async (req, res) => {
+        const messageReq = req.getMessage();
+        expect(messageReq.get("MSH.12").toString()).toBe("2.7");
+        await res.sendResponse("CA");
+        const messageRes = res.getAckMessage();
+        expect(messageRes?.get("MSA.1").toString()).toBe("CA");
+      });
+
+      await expectEvent(listener, "listen");
+
+      const client = new Client({ host: "0.0.0.0" });
+
+      const outbound = client.createConnection({ port }, async (res) => {
+        const messageRes = res.getMessage();
+        expect(messageRes.get("MSA.1").toString()).toBe("CA");
+        dfd.resolve();
+      });
+
+      await expectEvent(outbound, "connect");
+
+      let message = new Message({
+        messageHeader: {
+          msh_9_1: "ADT",
+          msh_9_2: "A01",
+          msh_10: "CONTROL_ID",
+          msh_11_1: "D",
+        },
+      });
+
+      await outbound.sendMessage(message);
+
+      await dfd.promise;
+
+      expect(client.totalSent()).toEqual(1);
+      expect(client.totalAck()).toEqual(1);
+
+      await outbound.close();
+      await listener.close();
+
+      client.closeAll();
+    });
+
+    test("...simple connect .. send CR", async () => {
+      let dfd = createDeferred<void>();
+
+      const server = new Server({ bindAddress: "0.0.0.0" });
+      const listener = server.createInbound({ port }, async (req, res) => {
+        const messageReq = req.getMessage();
+        expect(messageReq.get("MSH.12").toString()).toBe("2.7");
+        await res.sendResponse("CR");
+        const messageRes = res.getAckMessage();
+        expect(messageRes?.get("MSA.1").toString()).toBe("CR");
+      });
+
+      await expectEvent(listener, "listen");
+
+      const client = new Client({ host: "0.0.0.0" });
+
+      const outbound = client.createConnection({ port }, async (res) => {
+        const messageRes = res.getMessage();
+        expect(messageRes.get("MSA.1").toString()).toBe("CR");
+        dfd.resolve();
+      });
+
+      await expectEvent(outbound, "connect");
+
+      let message = new Message({
+        messageHeader: {
+          msh_9_1: "ADT",
+          msh_9_2: "A01",
+          msh_10: "CONTROL_ID",
+          msh_11_1: "D",
+        },
+      });
+
+      await outbound.sendMessage(message);
+
+      await dfd.promise;
+
+      expect(client.totalSent()).toEqual(1);
+      expect(client.totalAck()).toEqual(1);
+
+      await outbound.close();
+      await listener.close();
+
+      client.closeAll();
+    });
+
+    test("...simple connect .. send CE", async () => {
+      let dfd = createDeferred<void>();
+
+      const server = new Server({ bindAddress: "0.0.0.0" });
+      const listener = server.createInbound({ port }, async (req, res) => {
+        const messageReq = req.getMessage();
+        expect(messageReq.get("MSH.12").toString()).toBe("2.7");
+        await res.sendResponse("CE");
+        const messageRes = res.getAckMessage();
+        expect(messageRes?.get("MSA.1").toString()).toBe("CE");
+      });
+
+      await expectEvent(listener, "listen");
+
+      const client = new Client({ host: "0.0.0.0" });
+
+      const outbound = client.createConnection({ port }, async (res) => {
+        const messageRes = res.getMessage();
+        expect(messageRes.get("MSA.1").toString()).toBe("CE");
+        dfd.resolve();
+      });
+
+      await expectEvent(outbound, "connect");
+
+      let message = new Message({
+        messageHeader: {
+          msh_9_1: "ADT",
+          msh_9_2: "A01",
+          msh_10: "CONTROL_ID",
+          msh_11_1: "D",
+        },
+      });
+
+      await outbound.sendMessage(message);
+
+      await dfd.promise;
+
+      expect(client.totalSent()).toEqual(1);
+      expect(client.totalAck()).toEqual(1);
+
+      await outbound.close();
+      await listener.close();
+
+      client.closeAll();
+    });
+
+    test("...simple connect .. send CA when version is 2.1 .. sendMessage throws error", async () => {
+      let dfd = createDeferred<void>();
+
+      const server = new Server({ bindAddress: "0.0.0.0" });
+      const listener = server.createInbound({ port }, async (req, res) => {
+        const messageReq = req.getMessage();
+        expect(messageReq.get("MSH.12").toString()).toBe("2.1");
+        await res.sendResponse("CA");
+      });
+
+      await expectEvent(listener, "listen");
+
+      const client = new Client({ host: "0.0.0.0" });
+
+      const outbound = client.createConnection({ port }, async (res) => {
+        const messageRes = res.getMessage();
+        expect(messageRes.get("MSA.1").toString()).toBe("AE");
+        dfd.resolve();
+      });
+
+      await expectEvent(outbound, "connect");
+
+      let message = new Message({
+        specification: new HL7_2_1(),
+        messageHeader: {
+          msh_9: "ADT",
+          msh_9_1: "ADT",
+          msh_9_2: "A01",
+          msh_10: "CONTROL_ID",
+          msh_11_1: "D",
+        },
+      });
+
+      try {
+        await outbound.sendMessage(message);
+      } catch (error) {
+        console.error("Error sending message:", error);
+
+        expect(error).toBeDefined();
+        expect((error as HL7ServerError).message).toContain(
+          "Invalid MSA-1 value",
+        );
+      } finally {
+        await outbound.close();
+        await listener.close();
+
+        client.closeAll();
+      }
     });
 
     test("...simple connect ... MSH overrides", async () => {
