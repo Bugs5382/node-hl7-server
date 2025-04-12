@@ -53,7 +53,7 @@ jobs:
           cache: 'npm'
 
       - name: Install NPM
-        run: npm install --ignore-scripts
+        run: npm install --ignore-scripts  --force
 
       - name: Build Documents
         run: npm run typedoc
