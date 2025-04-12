@@ -23,7 +23,7 @@ jobs:
           tar -cvf documentation.tar ./docs
 
       - name: Create a document artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: documentation
           path: documentation.tar
@@ -53,7 +53,7 @@ jobs:
           cache: 'npm'
 
       - name: Install NPM
-        run: npm install --ignore-scripts
+        run: npm install --ignore-scripts  --force
 
       - name: Build Documents
         run: npm run typedoc

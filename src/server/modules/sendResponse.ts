@@ -16,6 +16,12 @@ import {
 } from "node-hl7-client/hl7";
 import type { ListenerOptions } from "../../utils/normalize.js";
 import { MLLPCodec } from "../../utils/codec.js";
+import { HL7ServerError } from "../../utils/exception.js";
+import {
+  MSA_1_VALUES_v2_1,
+  MSA_1_VALUES_v2_x,
+  validMSA1,
+} from "../../utils/constants.js";
 
 /**
  * Send Response
@@ -84,14 +90,22 @@ export class SendResponse extends EventEmitter {
    *
    * "AE" (Application Error) will be automatically sent if there is a problem creating either an "AA" or "AR"
    * message from the original message sent because the original message structure sent wrong in the first place.
+   *
+   * If the sepc of the Hl7 message you get from the client, is 2.1, the value sent back can be  "AA", "AR", "AE".
+   * Anything above 2.1 and greater fields are valid "AA", "AR", "AE", "CA", "CR", and "CE".
+   * If a CE is sent back with 2.1 the system will send an error in which
+   * the server will fail to respond proeprlly back to the client.
+   *
    */
   async sendResponse(
-    type: "AA" | "AR" | "AE",
+    type: validMSA1,
     encoding: BufferEncoding = "utf-8",
   ): Promise<void> {
     try {
       this._ack = this._createAckMessage(type, this._message);
     } catch (_e: any) {
+      if (_e instanceof HL7ServerError) throw _e;
+
       this._ack = this._createAEAckMessage();
     }
 
@@ -112,9 +126,13 @@ export class SendResponse extends EventEmitter {
   }
 
   /** @internal */
-  private _createAckMessage(type: string, message: Message): Message {
+  private _createAckMessage(type: validMSA1, message: Message): Message {
     let specClass;
+    /** Get spec **/
     const spec = message.get("MSH.12").toString();
+    /** Check to see if MSA1 is valid. */
+    this._validateMSA1(spec, type);
+    /** Get the class. */
     switch (spec) {
       case "2.1":
         specClass = new HL7_2_1();
@@ -182,6 +200,26 @@ export class SendResponse extends EventEmitter {
     segment.set("2", message.get("MSH.10").toString());
 
     return ackMessage;
+  }
+
+  /** @internal */
+  private _validateMSA1(spec: string, type: validMSA1): void {
+    switch (spec) {
+      case "2.1":
+        if (!MSA_1_VALUES_v2_1.includes(type)) {
+          throw new HL7ServerError(
+            `Invalid MSA-1 value: ${type} for HL7 version 2.1`,
+          );
+        }
+        break;
+      default:
+        if (![...MSA_1_VALUES_v2_1, ...MSA_1_VALUES_v2_x].includes(type)) {
+          throw new HL7ServerError(
+            `Invalid MSA-1 value: ${type} for HL7 version ${spec}`,
+          );
+        }
+        break;
+    }
   }
 
   /** @internal */
