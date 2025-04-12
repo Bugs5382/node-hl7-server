@@ -17,10 +17,11 @@ import {
 import type { ListenerOptions } from "../../utils/normalize.js";
 import { MLLPCodec } from "../../utils/codec.js";
 import { HL7ServerError } from "../../utils/exception.js";
-
-const MSA_1_VALUES_v2_1 = ["AA", "AR", "AE"];
-const MSA_1_VALUES_v2_x = ["CA", "CR", "CE"];
-type ValidMSA1 = "AA" | "AR" | "AE" | "CA" | "CR" | "CE";
+import {
+  MSA_1_VALUES_v2_1,
+  MSA_1_VALUES_v2_x,
+  validMSA1,
+} from "../../utils/constants.js";
 
 /**
  * Send Response
@@ -91,7 +92,7 @@ export class SendResponse extends EventEmitter {
    * message from the original message sent because the original message structure sent wrong in the first place.
    */
   async sendResponse(
-    type: ValidMSA1,
+    type: validMSA1,
     encoding: BufferEncoding = "utf-8",
   ): Promise<void> {
     try {
@@ -119,7 +120,7 @@ export class SendResponse extends EventEmitter {
   }
 
   /** @internal */
-  private _createAckMessage(type: ValidMSA1, message: Message): Message {
+  private _createAckMessage(type: validMSA1, message: Message): Message {
     let specClass;
     const spec = message.get("MSH.12").toString();
     this._validateMSA1(spec, type);
@@ -193,7 +194,7 @@ export class SendResponse extends EventEmitter {
   }
 
   /** @internal */
-  private _validateMSA1(spec: string, type: ValidMSA1): void {
+  private _validateMSA1(spec: string, type: validMSA1): void {
     switch (spec) {
       case "2.1":
         if (!MSA_1_VALUES_v2_1.includes(type)) {
