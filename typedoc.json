@@ -1,22 +1,12 @@
 {
   "tsconfig": "src/tsconfig.esm.json",
-  "entryPoints": ["src/index.ts"],
-  "excludeExternals": true,
-  "excludeInternal": true,
-  "includeVersion": true,
+  "entryPoints": ["./src/index.ts"],
   "githubPages": false,
+  "includeVersion": true,
   "plugin": ["@shipgirl/typedoc-plugin-versions"],
-  "out": "./docs",
-  "name": "Node HL7 Server",
-  "navigationLinks": {
-    "GitHub": "https://github.com/Bugs5382/node-hl7-server"
-  },
-  "visibilityFilters": {
-    "protected": true,
-    "private": false,
-    "inherited": false,
-    "external": true,
-    "@alpha": false,
-    "@beta": false
+  "out": "docs",
+  "name": "Fastify RabbitMQ",
+  "sidebarLinks": {
+    "View source on GitHub": "https://github.com/Bugs5382/fastify-rabbitmq"
   }
 }

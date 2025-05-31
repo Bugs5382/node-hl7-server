@@ -1,15 +1,12 @@
+import { MLLPCodec } from "@/utils/codec";
+import { ListenerOptions, normalizeListenerOptions } from "@/utils/normalize";
 import EventEmitter from "events";
 import net, { Socket } from "net";
+import { Batch, FileBatch, Message, isBatch, isFile } from "node-hl7-client";
 import tls from "tls";
-import { FileBatch, Batch, Message, isBatch, isFile } from "node-hl7-client";
-import {
-  ListenerOptions,
-  normalizeListenerOptions,
-} from "../utils/normalize.js";
-import { InboundRequest } from "./modules/inboundRequest.js";
-import { SendResponse } from "./modules/sendResponse.js";
-import { Server } from "./server.js";
-import { MLLPCodec } from "../utils/codec.js";
+import { InboundRequest } from "./modules/inboundRequest";
+import { SendResponse } from "./modules/sendResponse";
+import { Server } from "./server";
 
 /**
  * Inbound Handler

@@ -1,6 +1,5 @@
 name: Release and Publish
 on:
-  workflow_dispatch:
   release:
     types:
       - released
@@ -49,17 +48,17 @@ jobs:
           node-version: lts/*
           registry-url: 'https://registry.npmjs.org/'
 
-#      - name: Update Version in Package.json
-#        id: set-npm-tag
-#        run: |
-#          npm version $CLEAN_TAG --no-git-tag-version
-#          if [[ "$CLEAN_TAG" == *"beta"* ]]; then
-#            echo "NPM_TAG=beta" >> $GITHUB_OUTPUT
-#            echo "GIT_BRANCH_TARGET=develop" >> $GITHUB_OUTPUT
-#          else
-#            echo "NPM_TAG=latest" >> $GITHUB_OUTPUT
-#            echo "GIT_BRANCH_TARGET=main" >> $GITHUB_OUTPUT
-#          fi
+      - name: Update Version in Package.json
+        id: set-npm-tag
+        run: |
+          npm version $CLEAN_TAG --no-git-tag-version
+          if [[ "$CLEAN_TAG" == *"beta"* ]]; then
+            echo "NPM_TAG=beta" >> $GITHUB_OUTPUT
+            echo "GIT_BRANCH_TARGET=develop" >> $GITHUB_OUTPUT
+          else
+            echo "NPM_TAG=latest" >> $GITHUB_OUTPUT
+            echo "GIT_BRANCH_TARGET=main" >> $GITHUB_OUTPUT
+          fi
 
       - name: Publish to npm
         uses: JS-DevTools/npm-publish@v3
