@@ -1,5 +1,5 @@
+import { HL7ListenerError } from "@/utils/exception";
 import { Message } from "node-hl7-client";
-import { HL7ListenerError } from "../../utils/exception.js";
 
 /**
  * Inbound Request Props
