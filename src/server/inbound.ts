@@ -52,7 +52,7 @@ export class Inbound extends EventEmitter implements IInbound {
     /** Total message received to server.
      * @since 2.0.0 */
     received: 0,
-    /** Total message parsed by the server..
+    /** Total message parsed by the server.
      * @since 2.0.0 */
     totalMessage: 0,
   };
