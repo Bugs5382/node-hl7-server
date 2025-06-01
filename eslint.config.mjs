@@ -21,6 +21,6 @@ export default [
     }
   },
   {
-    ignores: [".node_modules/*", "docs/*", "lib/*", "__tests__/*"]
+    ignores: [".node_modules/*", "docs/*", "lib/*", "__tests__/*", "docker/*"]
   }
 ];
