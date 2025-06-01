@@ -1,15 +1,12 @@
+import { MLLPCodec } from "@/utils/codec";
+import { ListenerOptions, normalizeListenerOptions } from "@/utils/normalize";
 import EventEmitter from "events";
 import net, { Socket } from "net";
+import { Batch, FileBatch, Message, isBatch, isFile } from "node-hl7-client";
 import tls from "tls";
-import { FileBatch, Batch, Message, isBatch, isFile } from "node-hl7-client";
-import {
-  ListenerOptions,
-  normalizeListenerOptions,
-} from "../utils/normalize.js";
-import { InboundRequest } from "./modules/inboundRequest.js";
-import { SendResponse } from "./modules/sendResponse.js";
-import { Server } from "./server.js";
-import { MLLPCodec } from "../utils/codec.js";
+import { InboundRequest } from "./modules/inboundRequest";
+import { SendResponse } from "./modules/sendResponse";
+import { Server } from "./server";
 
 /**
  * Inbound Handler
@@ -26,7 +23,7 @@ import { MLLPCodec } from "../utils/codec.js";
  */
 export type InboundHandler = (req: InboundRequest, res: SendResponse) => void;
 
-export interface Inbound extends EventEmitter {
+export interface IInbound extends EventEmitter {
   /** When the connection form the client is closed. We might have an error, we might not. */
   on(name: "client.close", cb: (hasError: boolean) => void): this;
   /** When a connection from the client is made. */
@@ -49,7 +46,16 @@ export interface Inbound extends EventEmitter {
  * Inbound Listener Class
  * @since 1.0.0
  */
-export class Inbound extends EventEmitter implements Inbound {
+export class Inbound extends EventEmitter implements IInbound {
+  /** @internal */
+  readonly stats = {
+    /** Total message received to server.
+     * @since 2.0.0 */
+    received: 0,
+    /** Total message parsed by the server.
+     * @since 2.0.0 */
+    totalMessage: 0,
+  };
   /** @internal */
   private readonly _handler: (req: InboundRequest, res: SendResponse) => void;
   /** @internal */
@@ -64,15 +70,6 @@ export class Inbound extends EventEmitter implements Inbound {
   private _dataResult: boolean | undefined;
   /** @internal */
   private _codec: MLLPCodec | null;
-  /** @internal */
-  readonly stats = {
-    /** Total message received to server.
-     * @since 2.0.0 */
-    received: 0,
-    /** Total message parsed by the server..
-     * @since 2.0.0 */
-    totalMessage: 0,
-  };
 
   /**
    * Build a Listener
@@ -225,6 +222,9 @@ export class Inbound extends EventEmitter implements Inbound {
                 messageParsed,
                 this._opt.mshOverrides,
               );
+              res.on("response.sent", () => {
+                this.emit("response.sent");
+              });
               // on a response sent, tell the inbound listener
               void this._handler(req, res);
             });
@@ -241,6 +241,9 @@ export class Inbound extends EventEmitter implements Inbound {
               messageParsed,
               this._opt.mshOverrides,
             );
+            res.on("response.sent", () => {
+              this.emit("response.sent");
+            });
             // on a response sent, tell the inbound listener
             void this._handler(req, res);
           }

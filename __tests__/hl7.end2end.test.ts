@@ -1,15 +1,15 @@
 import fs from "fs";
-import path from "node:path";
-import { describe, expect, test } from "vitest";
-import tcpPortUsed from "tcp-port-used";
 import Client, { Batch, Message } from "node-hl7-client";
+import { HL7_2_1 } from "node-hl7-client/hl7";
+import path from "node:path";
+import tcpPortUsed from "tcp-port-used";
+import { describe, expect, test } from "vitest";
+import Server, { HL7ServerError } from "../src";
 import {
   createDeferred,
   expectEvent,
   generateLargeBase64String,
 } from "./__utils__";
-import Server, { HL7ServerError } from "../src";
-import { HL7_2_1 } from "node-hl7-client/hl7";
 
 const port = Number(process.env.TEST_PORT) || 3000;
 

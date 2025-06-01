@@ -11,10 +11,10 @@ labels: bug
 
 ## Environment
 
--   HL7 Client version/Application:
--   TypeScript version:
--   Node.js version:
--   OS:
+- HL7 Client version/Application:
+- TypeScript version:
+- Node.js version:
+- OS:
 
 Questions:
 
@@ -32,9 +32,8 @@ Questions:
 
 <!--
 
-Please provide the code causing the issue, as comprehensively as possible. 
+Please provide the code causing the issue, as comprehensively as possible.
 If the issue is related to a specific HL7 message, please include the actual
 Message you sent. Ensure that any sensitive information is scrubbed and sanitized before sharing.
 
 -->
-
