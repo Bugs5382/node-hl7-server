@@ -1,19 +1,22 @@
-import { defineConfig } from 'vitest/config'
+import path from "node:path";
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
   test: {
     coverage: {
-      provider: 'v8',
+      provider: "v8",
       exclude: [
-        '*.mjs',
-        '*.mts',
-        '__tests__/__utils__/**',
-        'docker',
-        'bin',
-        'certs',
-        'docs',
-        'lib'
-      ]
-    }
-  }
-})
+        "*.mts",
+        "*.mjs",
+        "**/__tests__/**/**",
+        "**/docs/**",
+        "**/lib/**",
+      ],
+    },
+  },
+});

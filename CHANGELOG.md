@@ -1,5 +1,18 @@
 # Node HL7 Server
 
+## v3.2.3 - 2025-03-23
+
+#### What Changed 👀
+
+#### 🐛 Bug Fixes
+
+- feat: v3.2.3 @Bugs5382 (#122)
+- fix: pass encoding set in the server to the codec @konstantingassmann (#121)
+
+### Extra
+
+**Full Changelog**: https://github.com/Bugs5382/node-hl7-server/compare/v3.2.2...v3.2.3
+
 ## v3.2.0 - 2025-01-26
 
 #### What Changed 👀

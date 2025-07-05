@@ -1,10 +1,10 @@
-import EventEmitter from "events";
-import { Inbound, InboundHandler } from "./inbound.js";
 import {
+  ListenerOptions,
   ServerOptions,
   normalizeServerOptions,
-  ListenerOptions,
-} from "../utils/normalize.js";
+} from "@/utils/normalize";
+import EventEmitter from "events";
+import { Inbound, InboundHandler } from "./inbound";
 
 /**
  * Server Class

@@ -1,3 +1,11 @@
+import { MLLPCodec } from "@/utils/codec";
+import {
+  MSA_1_VALUES_v2_1,
+  MSA_1_VALUES_v2_x,
+  validMSA1,
+} from "@/utils/constants";
+import { HL7ServerError } from "@/utils/exception";
+import type { ListenerOptions } from "@/utils/normalize";
 import EventEmitter from "events";
 import { Socket } from "net";
 import { Message, randomString } from "node-hl7-client";
@@ -14,14 +22,6 @@ import {
   HL7_2_7_1,
   HL7_2_8,
 } from "node-hl7-client/hl7";
-import type { ListenerOptions } from "../../utils/normalize.js";
-import { MLLPCodec } from "../../utils/codec.js";
-import { HL7ServerError } from "../../utils/exception.js";
-import {
-  MSA_1_VALUES_v2_1,
-  MSA_1_VALUES_v2_x,
-  validMSA1,
-} from "../../utils/constants.js";
 
 /**
  * Send Response
@@ -91,10 +91,10 @@ export class SendResponse extends EventEmitter {
    * "AE" (Application Error) will be automatically sent if there is a problem creating either an "AA" or "AR"
    * message from the original message sent because the original message structure sent wrong in the first place.
    *
-   * If the sepc of the Hl7 message you get from the client, is 2.1, the value sent back can be  "AA", "AR", "AE".
+   * If the specification of the Hl7 message you get from the client is 2.1, the value sent back can be  "AA", "AR", "AE".
    * Anything above 2.1 and greater fields are valid "AA", "AR", "AE", "CA", "CR", and "CE".
-   * If a CE is sent back with 2.1 the system will send an error in which
-   * the server will fail to respond proeprlly back to the client.
+   * If a CE is sent back with 2.1, the system will send an error in which
+   * the server will have failed to respond properly back to the client.
    *
    */
   async sendResponse(

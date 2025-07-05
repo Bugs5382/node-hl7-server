@@ -1,15 +1,12 @@
+import { MLLPCodec } from "@/utils/codec";
+import { ListenerOptions, normalizeListenerOptions } from "@/utils/normalize";
 import EventEmitter from "events";
 import net, { Socket } from "net";
+import { Batch, FileBatch, Message, isBatch, isFile } from "node-hl7-client";
 import tls from "tls";
-import { FileBatch, Batch, Message, isBatch, isFile } from "node-hl7-client";
-import {
-  ListenerOptions,
-  normalizeListenerOptions,
-} from "../utils/normalize.js";
-import { InboundRequest } from "./modules/inboundRequest.js";
-import { SendResponse } from "./modules/sendResponse.js";
-import { Server } from "./server.js";
-import { MLLPCodec } from "../utils/codec.js";
+import { InboundRequest } from "./modules/inboundRequest";
+import { SendResponse } from "./modules/sendResponse";
+import { Server } from "./server";
 
 /**
  * Inbound Handler
@@ -26,7 +23,7 @@ import { MLLPCodec } from "../utils/codec.js";
  */
 export type InboundHandler = (req: InboundRequest, res: SendResponse) => void;
 
-export interface Inbound extends EventEmitter {
+export interface IInbound extends EventEmitter {
   /** When the connection form the client is closed. We might have an error, we might not. */
   on(name: "client.close", cb: (hasError: boolean) => void): this;
   /** When a connection from the client is made. */
@@ -49,7 +46,16 @@ export interface Inbound extends EventEmitter {
  * Inbound Listener Class
  * @since 1.0.0
  */
-export class Inbound extends EventEmitter implements Inbound {
+export class Inbound extends EventEmitter implements IInbound {
+  /** @internal */
+  readonly stats = {
+    /** Total message received to server.
+     * @since 2.0.0 */
+    received: 0,
+    /** Total message parsed by the server.
+     * @since 2.0.0 */
+    totalMessage: 0,
+  };
   /** @internal */
   private readonly _handler: (req: InboundRequest, res: SendResponse) => void;
   /** @internal */
@@ -64,16 +70,24 @@ export class Inbound extends EventEmitter implements Inbound {
   private _dataResult: boolean | undefined;
   /** @internal */
   private _codec: MLLPCodec | null;
-  /** @internal */
-  readonly stats = {
-    /** Total message received to server.
-     * @since 2.0.0 */
-    received: 0,
-    /** Total message parsed by the server..
-     * @since 2.0.0 */
-    totalMessage: 0,
-  };
 
+  /** @internal */
+  private _handleMessages = (
+    socket: Socket,
+    messages: Message[],
+    type: "file" | "batch",
+  ) => {
+    messages.forEach((message: Message) => {
+      const parsed = new Message({ text: message.toString() });
+      ++this.stats.totalMessage;
+
+      const req = new InboundRequest(parsed, { type });
+      const res = new SendResponse(socket, parsed, this._opt.mshOverrides);
+
+      res.on("response.sent", () => this.emit("response.sent"));
+      void this._handler(req, res);
+    });
+  };
   /**
    * Build a Listener
    * @since 1.0.0
@@ -174,74 +188,29 @@ export class Inbound extends EventEmitter implements Inbound {
           // copy the completed message to continue processing and clear the buffer
           const completedMessageCopy = JSON.parse(
             JSON.stringify(loadedMessage),
-          );
-
-          // parser either is batch or a message
-          let parser: FileBatch | Batch | Message;
+          ) as string;
 
           // send raw information to the emitting
           this.emit("data.raw", completedMessageCopy);
 
           if (isFile(completedMessageCopy)) {
-            // parser the batch
-            parser = new FileBatch({ text: completedMessageCopy });
-            // load the messages
-            const allMessage = parser.messages();
-            allMessage.forEach((message: Message) => {
-              // parse this message
-              const messageParsed = new Message({ text: message.toString() });
-              // increase the total message
-              ++this.stats.totalMessage;
-              // create the inbound request
-              const req = new InboundRequest(messageParsed, { type: "file" });
-              // create the send response function
-              const res = new SendResponse(
-                socket,
-                message,
-                this._opt.mshOverrides,
-              );
-              // on a response sent, tell the inbound listener
-              res.on("response.sent", () => {
-                this.emit("response.sent");
-              });
-              void this._handler(req, res);
-            });
+            const parser = new FileBatch({ text: completedMessageCopy });
+            this._handleMessages(socket, parser.messages(), "file");
           } else if (isBatch(completedMessageCopy)) {
-            // parser the batch
-            parser = new Batch({ text: completedMessageCopy });
-            // load the messages
-            const allMessage = parser.messages();
-            // loop messages
-            allMessage.forEach((message: Message) => {
-              // parse this message
-              const messageParsed = new Message({ text: message.toString() });
-              // increase the total message
-              ++this.stats.totalMessage;
-              // create the inbound request
-              const req = new InboundRequest(messageParsed, { type: "file" });
-              // create the send response function
-              const res = new SendResponse(
-                socket,
-                messageParsed,
-                this._opt.mshOverrides,
-              );
-              // on a response sent, tell the inbound listener
-              void this._handler(req, res);
-            });
+            const parser = new Batch({ text: completedMessageCopy });
+            this._handleMessages(socket, parser.messages(), "batch");
           } else {
-            // parse this message
-            const messageParsed = new Message({ text: completedMessageCopy });
-            // increase the total message
+            const parsed = new Message({ text: completedMessageCopy });
             ++this.stats.totalMessage;
-            // create the inbound request
-            const req = new InboundRequest(messageParsed, { type: "file" });
-            // create the send response function
+
+            const req = new InboundRequest(parsed, { type: "message" });
             const res = new SendResponse(
               socket,
-              messageParsed,
+              parsed,
               this._opt.mshOverrides,
             );
-            // on a response sent, tell the inbound listener
+
+            res.on("response.sent", () => this.emit("response.sent"));
             void this._handler(req, res);
           }
         } catch (err) {

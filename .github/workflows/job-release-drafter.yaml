@@ -26,37 +26,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update Release Draft
-        id: release_drafter
         if: github.ref_name == 'main'
         uses: release-drafter/release-drafter@v6
         with:
           commitish: ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Strip "v" from Tag
-        id: strip_version
-        run: echo "CLEAN_TAG=${GITHUB_EVENT_RELEASE_TAG_NAME#v}" >> $GITHUB_OUTPUT
-        env:
-          GITHUB_EVENT_RELEASE_TAG_NAME: ${{ steps.release_drafter.outputs.tag_name }}
-
-      - name: Checkout package.json Only
-        uses: actions/checkout@v4
-        with:
-          token: '${{ secrets.GITHUB_TOKEN }}'
-          ref: ${{ env.GIT_BRANCH_TARGET }}
-          sparse-checkout: |
-            package.json
-          sparse-checkout-cone-mode: false
-
-      - name: Update Version in Package.json
-        run: npm version $CLEAN_TAG --no-git-tag-version
-        env:
-          CLEAN_TAG: ${{ steps.strip_version.outputs.CLEAN_TAG }}
-
-      - name: Commit and Push Version Update
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: "chore(pre-release): update package.json version [skip ci]"
-        env:
-          CLEAN_TAG: ${{ steps.strip_version.outputs.CLEAN_TAG }}

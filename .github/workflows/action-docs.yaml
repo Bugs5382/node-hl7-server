@@ -50,10 +50,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: 'npm'
 
       - name: Install NPM
-        run: npm install --ignore-scripts  --force
+        run: |
+          npm install --package-lock-only --force
+          npm install --ignore-scripts --force
 
       - name: Build Documents
         run: npm run typedoc
