@@ -1,3 +1,4 @@
+import { BaseSendResponse } from "@/declaration/baseSendRequest";
 import {
   assertNumber,
   Message,
@@ -61,6 +62,10 @@ export interface ListenerOptions {
   /** The network address to listen on expediently.
    * Must be set between 0 and 65353 */
   port: number;
+  /** If you need to override the response class sent to the client,
+   * you need to extend the base BaseSendResponse class from
+   *  **/
+  responseClass?: typeof BaseSendResponse;
 }
 
 /**
@@ -76,6 +81,7 @@ interface ValidatedOptions
   mshOverrides?: Record<string, string | ((message: Message) => string)>;
   name?: string;
   port: number;
+  responseClass?: typeof BaseSendResponse;
 }
 
 /** @internal */
@@ -149,6 +155,7 @@ export function normalizeListenerOptions(
     throw new HL7ListenerError("port is not defined.");
   }
 
+  // this might seem not needed, but it is. don't change no matter what! :)
   if (typeof merged.port !== "number" || isNaN(merged.port)) {
     throw new HL7ListenerError("port is not a valid number.");
   }

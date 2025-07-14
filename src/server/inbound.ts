@@ -1,3 +1,4 @@
+import { BaseSendResponse } from "@/declaration/baseSendRequest";
 import { MLLPCodec } from "@/utils/codec";
 import { ListenerOptions, normalizeListenerOptions } from "@/utils/normalize";
 import EventEmitter from "events";
@@ -21,7 +22,10 @@ import { Server } from "./server";
  *  })
  *```
  */
-export type InboundHandler = (req: InboundRequest, res: SendResponse) => void;
+export type InboundHandler = (
+  req: InboundRequest,
+  res: SendResponse | BaseSendResponse,
+) => void;
 
 export interface IInbound extends EventEmitter {
   /** When the connection form the client is closed. We might have an error, we might not. */
@@ -57,19 +61,24 @@ export class Inbound extends EventEmitter implements IInbound {
     totalMessage: 0,
   };
   /** @internal */
-  private readonly _handler: (req: InboundRequest, res: SendResponse) => void;
+  private _dataResult: boolean | undefined;
+  /** @internal */
+  private readonly _handler: (
+    req: InboundRequest,
+    res: SendResponse | BaseSendResponse,
+  ) => void;
   /** @internal */
   _main: Server;
   /** @internal */
   _opt: ReturnType<typeof normalizeListenerOptions>;
   /** @internal */
+  private _codec: MLLPCodec | null;
+  /** @internal */
+  private _sendResponseClass: typeof BaseSendResponse;
+  /** @internal */
   private readonly _socket: net.Server | tls.Server;
   /** @internal */
   private readonly _sockets: Socket[];
-  /** @internal */
-  private _dataResult: boolean | undefined;
-  /** @internal */
-  private _codec: MLLPCodec | null;
 
   /** @internal */
   private _handleMessages = (
@@ -82,12 +91,17 @@ export class Inbound extends EventEmitter implements IInbound {
       ++this.stats.totalMessage;
 
       const req = new InboundRequest(parsed, { type });
-      const res = new SendResponse(socket, parsed, this._opt.mshOverrides);
+      const res = new this._sendResponseClass(
+        socket,
+        parsed,
+        this._opt.mshOverrides,
+      );
 
       res.on("response.sent", () => this.emit("response.sent"));
       void this._handler(req, res);
     });
   };
+
   /**
    * Build a Listener
    * @since 1.0.0
@@ -102,6 +116,8 @@ export class Inbound extends EventEmitter implements IInbound {
     this._main = server;
 
     this._opt = normalizeListenerOptions(props);
+
+    this._sendResponseClass = this._opt.responseClass ?? SendResponse;
 
     this._sockets = [];
 
@@ -204,7 +220,7 @@ export class Inbound extends EventEmitter implements IInbound {
             ++this.stats.totalMessage;
 
             const req = new InboundRequest(parsed, { type: "message" });
-            const res = new SendResponse(
+            const res = new this._sendResponseClass(
               socket,
               parsed,
               this._opt.mshOverrides,

@@ -122,7 +122,7 @@ describe("node hl7 server", () => {
         const server = new Server();
         server.createInbound({ port: -1 }, async () => {});
       } catch (err: any) {
-        expect(err.message).toBe("port must be a number (0, 65353).");
+        expect(err.message).toEqual("port must be a number (0, 65353).");
       }
     });
 

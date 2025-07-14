@@ -1,13 +1,7 @@
-import { MLLPCodec } from "@/utils/codec";
-import {
-  MSA_1_VALUES_v2_1,
-  MSA_1_VALUES_v2_x,
-  validMSA1,
-} from "@/utils/constants";
+import { ISendRequest } from "@/declaration/ISendRequest";
+import { BaseSendResponse } from "@/declaration/baseSendRequest";
+import { validMSA1 } from "@/utils/constants";
 import { HL7ServerError } from "@/utils/exception";
-import type { ListenerOptions } from "@/utils/normalize";
-import EventEmitter from "events";
-import { Socket } from "net";
 import { Message, randomString } from "node-hl7-client";
 import {
   HL7_2_1,
@@ -27,31 +21,7 @@ import {
  * Send Response
  * @since 1.0.0
  */
-export class SendResponse extends EventEmitter {
-  /** @internal */
-  private _ack: Message | undefined;
-  /** @internal */
-  private readonly _socket: Socket;
-  /** @internal */
-  private readonly _message: Message;
-  /** @internal */
-  private readonly _mshOverrides: ListenerOptions["mshOverrides"];
-  /** @internal */
-  private readonly _codec: MLLPCodec;
-
-  constructor(
-    socket: Socket,
-    message: Message,
-    mshOverrides?: ListenerOptions["mshOverrides"],
-  ) {
-    super();
-    this._ack = undefined;
-    this._message = message;
-    this._mshOverrides = mshOverrides;
-    this._socket = socket;
-    this._codec = new MLLPCodec();
-  }
-
+export class SendResponse extends BaseSendResponse implements ISendRequest {
   /**
    * Send Response back to End User
    * @since 1.0.0
@@ -113,16 +83,6 @@ export class SendResponse extends EventEmitter {
 
     // we are sending a response back, why not?
     this.emit("response.sent");
-  }
-
-  /**
-   * Get the Ack Message
-   * @since 2.2.0
-   * @remarks Get the acknowledged message that was sent to the client.
-   * This could return undefined if accessed before sending the response
-   */
-  getAckMessage(): Message | undefined {
-    return this._ack;
   }
 
   /** @internal */
@@ -200,26 +160,6 @@ export class SendResponse extends EventEmitter {
     segment.set("2", message.get("MSH.10").toString());
 
     return ackMessage;
-  }
-
-  /** @internal */
-  private _validateMSA1(spec: string, type: validMSA1): void {
-    switch (spec) {
-      case "2.1":
-        if (!MSA_1_VALUES_v2_1.includes(type)) {
-          throw new HL7ServerError(
-            `Invalid MSA-1 value: ${type} for HL7 version 2.1`,
-          );
-        }
-        break;
-      default:
-        if (![...MSA_1_VALUES_v2_1, ...MSA_1_VALUES_v2_x].includes(type)) {
-          throw new HL7ServerError(
-            `Invalid MSA-1 value: ${type} for HL7 version ${spec}`,
-          );
-        }
-        break;
-    }
   }
 
   /** @internal */
