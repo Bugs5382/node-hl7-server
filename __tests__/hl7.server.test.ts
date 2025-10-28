@@ -1,3 +1,4 @@
+import { Socket } from "net";
 import { describe, expect, test } from "vitest";
 import { HL7ListenerError, InboundRequest, Server } from "../src";
 
@@ -5,7 +6,10 @@ describe("node hl7 server", () => {
   describe("sanity tests - modules", () => {
     test("InboundRequest - message undefined", async () => {
       // @ts-expect-error
-      const empty = new InboundRequest(undefined, { type: "file" });
+      const empty = new InboundRequest(undefined, {
+        type: "file",
+        socket: undefined,
+      });
       try {
         empty.getMessage();
       } catch (e) {
@@ -17,8 +21,15 @@ describe("node hl7 server", () => {
 
     test("InboundRequest - type check", async () => {
       // @ts-expect-error
-      const req = new InboundRequest("", { type: "file" });
+      const req = new InboundRequest("", { type: "file", socket: undefined });
       expect(req.getType()).toBe("file");
+    });
+
+    test("InboundRequest - socket check", async () => {
+      const socket = new Socket();
+      // @ts-expect-error
+      const req = new InboundRequest("", { type: "file", socket });
+      expect(req.getSocket()).toEqual(socket);
     });
   });
 
@@ -215,7 +226,10 @@ describe("node hl7 server", () => {
     test("error - getMessage() - no message passed to inbound request", async () => {
       try {
         // @ts-expect-error no message.
-        const inboundReq = new InboundRequest("", { type: "message" });
+        const inboundReq = new InboundRequest("", {
+          type: "message",
+          socket: undefined,
+        });
         // this should cause an error
         inboundReq.getMessage();
       } catch (err: any) {

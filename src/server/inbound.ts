@@ -1,7 +1,8 @@
 import EventEmitter from "events";
 import net, { Socket } from "net";
+import { Batch, FileBatch, Message, isBatch, isFile } from "node-hl7-client";
 import tls from "tls";
-import { FileBatch, Batch, Message, isBatch, isFile } from "node-hl7-client";
+import { MLLPCodec } from "../utils/codec.js";
 import {
   ListenerOptions,
   normalizeListenerOptions,
@@ -9,7 +10,6 @@ import {
 import { InboundRequest } from "./modules/inboundRequest.js";
 import { SendResponse } from "./modules/sendResponse.js";
 import { Server } from "./server.js";
-import { MLLPCodec } from "../utils/codec.js";
 
 /**
  * Inbound Handler
@@ -193,7 +193,10 @@ export class Inbound extends EventEmitter implements Inbound {
               // increase the total message
               ++this.stats.totalMessage;
               // create the inbound request
-              const req = new InboundRequest(messageParsed, { type: "file" });
+              const req = new InboundRequest(messageParsed, {
+                type: "file",
+                socket,
+              });
               // create the send response function
               const res = new SendResponse(
                 socket,
@@ -218,7 +221,10 @@ export class Inbound extends EventEmitter implements Inbound {
               // increase the total message
               ++this.stats.totalMessage;
               // create the inbound request
-              const req = new InboundRequest(messageParsed, { type: "file" });
+              const req = new InboundRequest(messageParsed, {
+                type: "file",
+                socket,
+              });
               // create the send response function
               const res = new SendResponse(
                 socket,
@@ -234,7 +240,10 @@ export class Inbound extends EventEmitter implements Inbound {
             // increase the total message
             ++this.stats.totalMessage;
             // create the inbound request
-            const req = new InboundRequest(messageParsed, { type: "file" });
+            const req = new InboundRequest(messageParsed, {
+              type: "file",
+              socket,
+            });
             // create the send response function
             const res = new SendResponse(
               socket,
