@@ -1,3 +1,8 @@
+# NOTICE (READ ONLY)
+
+I have moved this code into a mono repo [here](https://github.com/Bugs5382/node-hl7). The same functionialy but now in one repo. Version 4.0.0 is where the new repo will start off for both packages.
+
+
 ## Node HL7 Server
 Node.js client library for creating a HL7 Server which can accept incoming a properly formatted HL7 message(s), and then parses the HL7 message. Once the message has been parsed you can then do something with the final result that you so desire.
 
